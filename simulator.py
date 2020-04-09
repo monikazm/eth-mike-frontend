@@ -12,6 +12,7 @@ from assessment_modes.pos_match import PositionMatchingAssessment
 from assessment_modes.rom import RangeOfMotionAssessment
 from assessment_modes.sensorimotor import SensoriMotorAssessment
 from datamodels import PatientResponse, MotorState, ControlResponse, AssessmentType
+from util import PrintUtil
 
 
 # Simulator states, transitions occur based on control signals
@@ -44,13 +45,13 @@ class BackendSimulator:
         Assessment.HAS_ANALOG_INPUT = self.use_gamepad
 
     def update_patient_data(self, data: PatientResponse):
-        Assessment.print_normally(f'Received {data}')
+        PrintUtil.print_normally(f'Received {data}')
         self.current_patient = data
         self.current_motor_state.LeftHand = data.LeftHand
         self.current_assessment = assessments_class_for_type[data.AssessmentMode]()
 
     def update_control_data(self, data: ControlResponse):
-        Assessment.print_normally(f'Received {data}')
+        PrintUtil.print_normally(f'Received {data}')
         if data.EmergencyStop:
             self.current_state = SimulatorState.DISABLED
             self._reset()
@@ -62,7 +63,7 @@ class BackendSimulator:
             self.current_assessment.on_start(self.current_motor_state)
             self.last_update = time.time_ns()
         elif data.FrontendStarted:
-            Assessment.print_normally('Frontend started')
+            PrintUtil.print_normally('Frontend started')
             pass
         if data.Close:
             self.current_state = SimulatorState.DISABLED
@@ -91,6 +92,6 @@ class BackendSimulator:
             tv += float(is_pressed('right') - is_pressed('left'))
 
             self.current_assessment.on_update(self.current_motor_state, tv, delta_time)
-            if self.current_assessment.is_finished(self.current_motor_state):
+            if self.current_assessment.is_finished():
                 self.current_assessment = None
                 self.current_motor_state = MotorState(LeftHand=self.current_patient.LeftHand, Finished=True)

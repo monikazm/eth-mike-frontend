@@ -4,6 +4,8 @@ from enum import IntEnum
 
 from dataclasses_json import dataclass_json
 
+from auto_movement import AutomaticMovement
+
 
 class RomState(IntEnum):
     ActiveMotion = 0
@@ -33,6 +35,13 @@ class MotorState:
     Finished: bool = False
     Flexion: bool = True
     RomState: RomState = RomState.ActiveMotion
+
+    def move_using(self, auto_mover: AutomaticMovement) -> AutomaticMovement.MovementState:
+        self.Position, state = auto_mover.get_current_position_and_state()
+        return state
+
+    def is_at_position(self, position: float) -> bool:
+        return math.fabs(position - self.Position) < 0.0001
 
 
 @dataclass_json
