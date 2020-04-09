@@ -49,10 +49,13 @@ def main():
         for sock in send_socks:
             assert sock == data_client
             # Get updated motor state from simulator
-            state = simulator.get_motor_state().to_json()
+            ms = simulator.get_motor_state()
 
             # Send new motor state to frontend
-            data_client.sendto(state.encode('utf-8'), DATA_DEST)
+            data_client.sendto(ms.to_json().encode('utf-8'), DATA_DEST)
+
+            if ms.Finished:
+                time.sleep(0.2)
 
             # Wait 1ms to simulate 1kHz update frequency, accuracy of this depends on OS
             time.sleep(0.001)
