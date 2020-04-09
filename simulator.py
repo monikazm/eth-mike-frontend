@@ -82,15 +82,14 @@ class BackendSimulator:
         delta_time = (current_time - self.last_update) / 1_000_000_000
         self.last_update = current_time
 
-        tv = 0.0
-        if self.current_motor_state.TargetState:
+        self.current_motor_state.Time = ((time.time_ns() - self.start_time) // 1_000_000) / 1000
+        if self.current_assessment is not None:
+            tv = 0.0
             if self.use_gamepad:
                 state = xinput.get_state(0)
                 tv = xinput.get_thumb_values(state)[0][0]
-            tv += float(is_pressed('right')) - float(is_pressed('left'))
+            tv += float(is_pressed('right') - is_pressed('left'))
 
-        self.current_motor_state.Time = ((time.time_ns() - self.start_time) // 1_000_000) / 1000
-        if self.current_assessment is not None:
             self.current_assessment.on_update(self.current_motor_state, tv, delta_time)
             if self.current_assessment.is_finished(self.current_motor_state):
                 self.current_assessment = None
