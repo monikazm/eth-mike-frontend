@@ -54,8 +54,8 @@ def main():
             # Send new motor state to frontend
             data_client.sendto(state.encode('utf-8'), DATA_DEST)
 
-            # Wait 30ms (TODO adjust this to actual robot update interval)
-            time.sleep(0.03)
+            # Wait 1ms to simulate 1kHz update frequency, accuracy of this depends on OS
+            time.sleep(0.001)
 
 
 if __name__ == '__main__':
