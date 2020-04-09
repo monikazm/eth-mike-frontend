@@ -55,7 +55,7 @@ class RangeOfMotionAssessment(Assessment):
         if motor_state.RomState == RomState.AutomaticPassiveMovement:
             motor_state.StartingPosition = (self.p_max_motion + self.p_min_motion) / 2.0
         else:
-            motor_state.StartingPosition = 0.0
+            motor_state.StartingPosition = 30.0 if motor_state.LeftHand else -30
         move_time = 0.0 if motor_state.is_at_position(motor_state.StartingPosition) else 3.0
         self.auto_mover = MoverFactory.make_linear_mover(motor_state.Position, motor_state.StartingPosition, move_time)
         self.goto_state(S.MOVING_TO_START)

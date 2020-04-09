@@ -37,6 +37,12 @@ class MotorState:
     Flexion: bool = True
     RomState: RomState = RomState.ActiveMotion
 
+    @staticmethod
+    def new(patient: 'PatientResponse', **kwargs) -> 'MotorState':
+        assert 'StartingPosition' not in kwargs
+        left = patient.LeftHand
+        return MotorState(LeftHand=left, StartingPosition=(30.0 if left else -30.0), **kwargs)
+
     def move_using(self, auto_mover: AutomaticMovement) -> AutomaticMovement.MovementState:
         self.Position, state = auto_mover.get_current_position_and_state()
         PrintUtil.print_inplace(f'Current robot position: {self.Position:.3f}°')

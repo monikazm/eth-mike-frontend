@@ -47,7 +47,7 @@ class BackendSimulator:
     def update_patient_data(self, data: PatientResponse):
         PrintUtil.print_normally(f'Received {data}')
         self.current_patient = data
-        self.current_motor_state.LeftHand = data.LeftHand
+        self._reset()
         self.current_assessment = assessments_class_for_type[data.AssessmentMode]()
 
     def update_control_data(self, data: ControlResponse):
@@ -75,7 +75,8 @@ class BackendSimulator:
         return self.current_motor_state
 
     def _reset(self):
-        self.current_motor_state = MotorState()
+        self.current_motor_state = MotorState.new(self.current_patient)
+        self.current_assessment = None
         self.start_time = time.time_ns()
 
     def _update_motor_state(self):
@@ -94,4 +95,4 @@ class BackendSimulator:
             self.current_assessment.on_update(self.current_motor_state, tv, delta_time)
             if self.current_assessment.is_finished():
                 self.current_assessment = None
-                self.current_motor_state = MotorState(LeftHand=self.current_patient.LeftHand, Finished=True)
+                self.current_motor_state = MotorState.new(self.current_patient, Finished=True)
