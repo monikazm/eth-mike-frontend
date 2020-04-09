@@ -65,7 +65,9 @@ class RangeOfMotionAssessment(Assessment):
             if motor_state.move_using(self.auto_mover).has_finished():
                 if motor_state.RomState == RomState.AutomaticPassiveMovement:
                     amplitude = (self.p_max_motion - self.p_min_motion) / 2.0
-                    freq = 0.5
+                    if not motor_state.LeftHand:
+                        amplitude = -amplitude
+                    freq = 1.0
                     self.auto_mover = MoverFactory.make_sine_mover(motor_state.Position, 2.0, (amplitude, freq))
                     self.goto_state(S.AUTO_MOVE)
                 else:

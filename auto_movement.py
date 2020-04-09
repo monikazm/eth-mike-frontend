@@ -37,7 +37,6 @@ class AutomaticMovement(metaclass=ABCMeta):
             return self.start_pos, AutomaticMovement.MovementState(True)
         t = min(get_current_time() - self.start_time, self.duration)
         pos = self._get_current_position(t)
-        PrintUtil.print_inplace(f'Current robot position: {pos:.3f}°')
         return pos, AutomaticMovement.MovementState(t == self.duration)
 
     @abstractmethod
@@ -60,7 +59,8 @@ class AutomaticLinearMovement(AutomaticMovement):
     def _get_current_position(self, t: float) -> float:
         if math.fabs(self.duration - t) < 0.0001:
             t = self.duration
-        current_pos = self.lerp(self.start_pos, self.end_pos, t / self.duration)
+        normalized_t = t / self.duration
+        current_pos = self.lerp(self.start_pos, self.end_pos, normalized_t)
         return current_pos
 
 
@@ -72,11 +72,12 @@ class AutomaticSineMovement(AutomaticMovement):
         self.sine_parameters = amplitude_freqs
 
     @staticmethod
-    def sine(amplitude: float, freq: float, t: float) -> float:
-        return math.sin(2.0 * math.pi * freq * t) * amplitude
+    def sine(amplitude: float, freq: float, normalized_t: float) -> float:
+        return math.sin(2.0 * math.pi * freq * normalized_t) * amplitude
 
     def _get_current_position(self, t: float) -> float:
         if math.fabs(self.duration - t) < 0.0001:
             t = self.duration
-        current_pos = self.start_pos + sum(self.sine(amplitude, freq, t) for amplitude, freq in self.sine_parameters)
+        normalized_t = t / self.duration
+        current_pos = self.start_pos + sum(self.sine(amplitude, freq, normalized_t) for amplitude, freq in self.sine_parameters)
         return current_pos

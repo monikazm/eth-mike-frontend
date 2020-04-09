@@ -5,6 +5,7 @@ from enum import IntEnum
 from dataclasses_json import dataclass_json
 
 from auto_movement import AutomaticMovement
+from util import PrintUtil
 
 
 class RomState(IntEnum):
@@ -38,6 +39,12 @@ class MotorState:
 
     def move_using(self, auto_mover: AutomaticMovement) -> AutomaticMovement.MovementState:
         self.Position, state = auto_mover.get_current_position_and_state()
+        PrintUtil.print_inplace(f'Current robot position: {self.Position:.3f}°')
+        return state
+
+    def move_target_using(self, auto_mover: AutomaticMovement) -> AutomaticMovement.MovementState:
+        self.TargetPosition, state = auto_mover.get_current_position_and_state()
+        PrintUtil.print_inplace(f'Current robot position: {self.Position:.3f}°, target position: {self.TargetPosition:.3f}°')
         return state
 
     def is_at_position(self, position: float) -> bool:
