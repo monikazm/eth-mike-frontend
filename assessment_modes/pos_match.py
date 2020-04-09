@@ -1,7 +1,8 @@
 import random
 from enum import IntEnum
+from typing import Optional
 
-from assessment import Assessment
+from assessment import Assessment, AutomaticMovement
 from datamodels import MotorState
 
 
@@ -20,6 +21,9 @@ class PositionMatchingAssessment(Assessment):
         # Current state
         self.state = POMState.STANDBY
 
+        # Used for automatic movement to starting position and target position
+        self._automove: Optional[AutomaticMovement] = None
+
     def is_finished(self, motor_state: MotorState) -> bool:
         return self.state == POMState.FINISHED
 
@@ -34,24 +38,27 @@ class PositionMatchingAssessment(Assessment):
 
         # Start new probe
         motor_state.TrialNr += 1
-        motor_state.StartingPosition = 30 if motor_state.LeftHand else -30
+        motor_state.StartingPosition = 30.0 if motor_state.LeftHand else -30.0
+
+        self._automove = AutomaticMovement(motor_state.Position, motor_state.StartingPosition, 3.0)
         self.state = POMState.MOVING_TO_START
 
     def on_update(self, motor_state: MotorState, directional_input: float, delta_time: float):
         if self.state == POMState.MOVING_TO_START:
-            if motor_state.reached_position(motor_state.StartingPosition):
+            if motor_state.Position == motor_state.StartingPosition:
                 # Robot is at starting position, compute random destination
                 self.print_normally('Reached start')
-                motor_state.TargetPosition = random.uniform(40.0, 60.0)
+                motor_state.TargetPosition = float(random.randint(40, 60))
                 if not motor_state.LeftHand:
-                    motor_state.TargetPosition *= -1
+                    motor_state.TargetPosition *= -1.0
+                self._automove = AutomaticMovement(motor_state.Position, motor_state.TargetPosition, 3.0)
                 self.state = POMState.MOVING_TO_HIDDEN_DEST
             else:
                 # Automatic movement towards starting position
-                self.automatic_move_towards(motor_state, motor_state.StartingPosition, delta_time)
+                motor_state.Position = self._automove.current_location
         elif self.state == POMState.MOVING_TO_HIDDEN_DEST:
-            if motor_state.reached_position(motor_state.TargetPosition):
+            if motor_state.Position == motor_state.TargetPosition:
                 motor_state.TargetState = True
                 self.state = POMState.USER_INPUT
             else:
-                self.automatic_move_towards(motor_state, motor_state.TargetPosition, delta_time)
+                motor_state.Position = self._automove.current_location

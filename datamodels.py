@@ -34,9 +34,6 @@ class MotorState:
     Flexion: bool = True
     RomState: RomState = RomState.ActiveMotion
 
-    def reached_position(self, position) -> bool:
-        return math.fabs(self.Position - position) < 0.5
-
 
 @dataclass_json
 @dataclass

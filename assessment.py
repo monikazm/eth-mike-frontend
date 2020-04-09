@@ -1,8 +1,30 @@
+import math
 import sys
 import time
 from abc import ABCMeta, abstractmethod
 
 from datamodels import MotorState
+
+
+class AutomaticMovement:
+    """Linear interpolation between two positions within a particular duration"""
+
+    def __init__(self, start_position: float, target_position: float, duration: float):
+        self.start = start_position
+        self.end = target_position
+        self.start_time = time.time_ns() / 1_000_000_000
+        self.duration = duration
+        self.end_time = self.start_time + duration
+
+    @property
+    def current_location(self) -> float:
+        current_time = min(time.time_ns() / 1_000_000_000, self.end_time)
+        if math.fabs(self.end_time - current_time) < 0.0001:
+            current = self.end
+        else:
+            current = Assessment.lerp(self.start, self.end, (current_time - self.start_time) / self.duration)
+        Assessment.print_inplace(f'Current robot position: {current:.3f}°')
+        return current
 
 
 class Assessment(metaclass=ABCMeta):
@@ -12,14 +34,13 @@ class Assessment(metaclass=ABCMeta):
     MAX_FORCE = 50
 
     # Speeds are in [degree / s]
-    AUTOMATIC_MOVEMENT_MAX_SPEED = 30.0
     USER_MAX_MOVEMENT_SPEED = 50.0
 
     # Rates at how digital input changes applied force [N / s]
     USER_FORCE_CHANGE_SPEED = 30.0
 
     # Rates at how velocity accelerates with digital input [degree / s^2]
-    USER_ACCELERATION_RATE = 20.0
+    USER_ACCELERATION_RATE = 2200.0
 
     # This is set by simulator depending on whether a gamepad is plugged in
     HAS_ANALOG_INPUT = False
@@ -66,12 +87,9 @@ class Assessment(metaclass=ABCMeta):
         return (time.time_ns() - start_time) / 1_000_000_000
 
     @staticmethod
-    def automatic_move_towards(motor_state, position, delta_time):
-        """Perform automatic robot movement towards position."""
-        direction = 1.0 if position > motor_state.Position else -1.0
-        motor_state.Position += Assessment.get_movement_delta(direction, delta_time,
-                                                              Assessment.AUTOMATIC_MOVEMENT_MAX_SPEED)
-        Assessment.print_inplace(f'Current robot position: {motor_state.Position:.3f}°')
+    def lerp(start, end, t: float):
+        """Linear interpolation between start and end with t in [0, 1]"""
+        return start + (end - start) * t
 
     @staticmethod
     def get_movement_delta(normalized_velocity, delta_time, speed):
