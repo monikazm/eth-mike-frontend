@@ -21,9 +21,6 @@ class ForceAssessment(Assessment):
         # The probe number within the current phase
         self.phase_probe_num = 0
 
-        # Stores the currently applied force (only during 3sec force phase)
-        self.current_force = 0
-
         # Used to simulate delays
         self.timer = Timer()
 
@@ -58,21 +55,21 @@ class ForceAssessment(Assessment):
                     else:
                         directional_input = max(0.0, directional_input)
 
-                    self.current_force = directional_input * Assessment.MAX_FORCE
+                    motor_state.Force = directional_input * Assessment.MAX_FORCE
                 else:
                     # Depending on flexion/extension, different directions lead to increase in force
                     if motor_state.Flexion != motor_state.LeftHand:
                         directional_input = -directional_input
 
-                    self.current_force += self.get_movement_delta(directional_input, delta_time,
-                                                                  Assessment.USER_FORCE_CHANGE_SPEED)
+                    motor_state.Force += self.get_movement_delta(directional_input, delta_time,
+                                                                 Assessment.USER_FORCE_CHANGE_SPEED)
 
-                self.current_force = min(max(0.0, self.current_force), Assessment.MAX_FORCE)
-                PrintUtil.print_inplace(f'Current force: {self.current_force:.3f} N')
+                motor_state.Force = min(max(0.0, motor_state.Force), Assessment.MAX_FORCE)
+                PrintUtil.print_inplace(f'Current force: {motor_state.Force:.3f} N')
             else:
                 # After 3 seconds, the probe ends
                 motor_state.TargetState = False
-                self.current_force = 0.0
+                motor_state.Force = 0.0
 
                 if self.phase_probe_num == 3:
                     # Move on to extension phase or quit if this has already been the extension phase

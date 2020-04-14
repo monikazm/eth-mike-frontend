@@ -36,6 +36,7 @@ class MotorState:
     Finished: bool = False
     Flexion: bool = True
     RomState: RomState = RomState.ActiveMotion
+    Force: float = 0.0
 
     @staticmethod
     def new(patient: 'PatientResponse', **kwargs) -> 'MotorState':
