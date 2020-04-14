@@ -9,10 +9,9 @@ from util import PrintUtil
 
 class S(IntEnum):
     STANDBY = 0
-    STANDBY_IN_PHASE = 1
-    MOVING_TO_START = 2
-    USER_INPUT = 3
-    AUTO_MOVE = 4
+    MOVING_TO_START = 1
+    USER_INPUT = 2
+    AUTO_MOVE = 3
 
     FINISHED = -1
 
@@ -20,9 +19,6 @@ class S(IntEnum):
 class RangeOfMotionAssessment(Assessment):
     def __init__(self) -> None:
         super().__init__(S.STANDBY)
-
-        # Current trial number within a phase
-        self.phase_probe_num = 0
 
         # Extreme positions recorded during passive movement phase
         self.p_min_motion = 0
@@ -33,25 +29,21 @@ class RangeOfMotionAssessment(Assessment):
 
     def on_start(self, motor_state: MotorState):
         if self.in_state(S.USER_INPUT):
-            if self.phase_probe_num == 3:
+            if motor_state.TrialNr == 3:
                 # Goto next phase
                 motor_state.TargetState = False
                 motor_state.RomState = RomState(motor_state.RomState + 1)
+                motor_state.TrialNr = 0
                 self.goto_state(S.STANDBY)
                 return
             else:
-                self.goto_state(S.STANDBY_IN_PHASE)
+                self.goto_state(S.STANDBY)
 
         if self.in_state(S.STANDBY):
-            self.phase_probe_num = 0
-            self.goto_state(S.STANDBY_IN_PHASE)
-
-        if self.in_state(S.STANDBY_IN_PHASE):
             self._start_probe(motor_state)
 
     def _start_probe(self, motor_state):
         motor_state.TrialNr += 1
-        self.phase_probe_num += 1
         if motor_state.RomState == RomState.AutomaticPassiveMovement:
             motor_state.StartingPosition = (self.p_max_motion + self.p_min_motion) / 2.0
         else:
@@ -88,7 +80,7 @@ class RangeOfMotionAssessment(Assessment):
                 PrintUtil.print_inplace(f'Current position: {motor_state.Position:.3f}°')
         elif self.in_state(S.AUTO_MOVE):
             if motor_state.move_using(self.auto_mover).has_finished():
-                if self.phase_probe_num == 3:
+                if motor_state.TrialNr == 3:
                     self.goto_state(S.FINISHED)
                 else:
                     self._start_probe(motor_state)
