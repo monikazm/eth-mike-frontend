@@ -2,10 +2,10 @@ import random
 from enum import IntEnum
 from typing import Optional
 
-from assessment import Assessment
-from auto_movement import AutomaticMovement, MoverFactory
-from datamodels import MotorState
-from util import PrintUtil
+from mike_simulator.assessment import Assessment
+from mike_simulator.auto_movement import AutomaticMovement, MoverFactory
+from mike_simulator.datamodels import MotorState
+from mike_simulator.util import PrintUtil
 
 
 class S(IntEnum):

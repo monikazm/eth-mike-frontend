@@ -5,14 +5,14 @@ from typing import Optional
 import XInput as xinput
 from keyboard import is_pressed
 
-from assessment import Assessment
-from assessment_modes.force import ForceAssessment
-from assessment_modes.motor import MotorAssessment
-from assessment_modes.pos_match import PositionMatchingAssessment
-from assessment_modes.rom import RangeOfMotionAssessment
-from assessment_modes.sensorimotor import SensoriMotorAssessment
-from datamodels import PatientResponse, MotorState, ControlResponse, AssessmentType
-from util import PrintUtil
+from mike_simulator.assessment import Assessment
+from mike_simulator.assessment_modes import ForceAssessment
+from mike_simulator.assessment_modes import MotorAssessment
+from mike_simulator.assessment_modes import PositionMatchingAssessment
+from mike_simulator.assessment_modes import RangeOfMotionAssessment
+from mike_simulator.assessment_modes import SensoriMotorAssessment
+from mike_simulator.datamodels import PatientResponse, MotorState, ControlResponse, AssessmentType
+from mike_simulator.util import PrintUtil
 
 
 # Simulator states, transitions occur based on control signals

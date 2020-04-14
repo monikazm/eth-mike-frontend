@@ -4,8 +4,8 @@ from enum import IntEnum
 
 from dataclasses_json import dataclass_json
 
-from auto_movement import AutomaticMovement
-from util import PrintUtil
+from mike_simulator.auto_movement import AutomaticMovement
+from mike_simulator.util import PrintUtil
 
 
 class RomState(IntEnum):

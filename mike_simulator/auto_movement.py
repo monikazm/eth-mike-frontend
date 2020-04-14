@@ -2,7 +2,7 @@ import math
 from abc import ABCMeta, abstractmethod
 from typing import Tuple
 
-from util import PrintUtil, get_current_time
+from mike_simulator.util import get_current_time
 
 
 class MoverFactory:

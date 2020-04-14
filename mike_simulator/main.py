@@ -2,8 +2,8 @@ import select
 import socket
 import time
 
-from datamodels import PatientResponse, ControlResponse
-from simulator import BackendSimulator
+from mike_simulator.datamodels import PatientResponse, ControlResponse
+from mike_simulator.simulator import BackendSimulator
 
 # Everything is on localhost
 UDP_IP = '127.0.0.1'

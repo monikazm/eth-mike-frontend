@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
-from datamodels import MotorState
+from mike_simulator.datamodels import MotorState
 
 
 class Assessment(metaclass=ABCMeta):

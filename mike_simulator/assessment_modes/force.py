@@ -1,8 +1,8 @@
 from enum import IntEnum
 
-from assessment import Assessment
-from datamodels import MotorState
-from util import PrintUtil, Timer
+from mike_simulator.assessment import Assessment
+from mike_simulator.datamodels import MotorState
+from mike_simulator.util import PrintUtil, Timer
 
 
 class S(IntEnum):
