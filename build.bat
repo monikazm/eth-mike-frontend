@@ -11,6 +11,5 @@ call venv\Scripts\activate.bat
 pyinstaller --onefile main.py
 copy dist\main.exe Simulator.exe
 rmdir /S /Q dist
-rmdir /S /Q build
 rmdir /S /Q __pycache__
-del main.spec
+rmdir /S /Q assessment_modes\__pycache__
