@@ -72,6 +72,7 @@ class ForceAssessment(Assessment):
             else:
                 # After 3 seconds, the probe ends
                 motor_state.TargetState = False
+                self.current_force = 0.0
 
                 if self.phase_probe_num == 3:
                     # Move on to extension phase or quit if this has already been the extension phase
