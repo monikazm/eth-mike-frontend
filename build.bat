@@ -13,3 +13,4 @@ copy dist\main.exe Simulator.exe
 rmdir /S /Q dist
 rmdir /S /Q mike_simulator\__pycache__
 rmdir /S /Q mike_simulator\assessment_modes\__pycache__
+rmdir /S /Q mike_simulator\input_backends\__pycache__
