@@ -9,6 +9,9 @@ from mike_simulator.util import PrintUtil
 
 
 class Constants:
+    # Log to csv every n_th cycle
+    LOG_CYCLES = 3
+
     # Robot cycle time [s]
     ROBOT_CYCLE_TIME = 0.001
 

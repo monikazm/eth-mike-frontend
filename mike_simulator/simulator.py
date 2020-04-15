@@ -1,3 +1,4 @@
+import sys
 import time
 from enum import Enum
 from typing import Optional
@@ -7,6 +8,7 @@ import XInput as xinput
 from mike_simulator.assessment.factory import Assessment, AssessmentFactory
 from mike_simulator.datamodels import ControlResponse, PatientResponse, MotorState, Constants
 from mike_simulator.input.factory import InputMethod, InputHandlerFactory
+from mike_simulator.logger import Logger
 from mike_simulator.util import PrintUtil
 
 
@@ -23,12 +25,16 @@ class BackendSimulator:
         self.current_patient: PatientResponse = PatientResponse()
         self.current_state = SimulatorState.DISABLED
         self.current_assessment: Optional[Assessment] = None
+        self.logger: Optional[Logger] = None
 
         self.last_update = -1
         if any(xinput.get_connected()):
             self.input_handler = InputHandlerFactory.create(InputMethod.Gamepad)
         else:
             self.input_handler = InputHandlerFactory.create(InputMethod.Keyboard)
+
+        self.frontend_started = False
+        self.cycle_counter = 0
 
         self._reset()
 
@@ -38,12 +44,14 @@ class BackendSimulator:
         self._reset()
         self.current_assessment = AssessmentFactory.create(data.AssessmentMode)
         self.input_handler.begin_assessment(self.current_assessment)
+        self.logger = Logger(self.current_patient)
 
     def update_control_data(self, data: ControlResponse):
         PrintUtil.print_normally(f'Received {data}')
         if data.EmergencyStop:
             self.current_state = SimulatorState.DISABLED
             self._reset()
+            sys.exit(-1)
         elif data.Restart:
             self.current_state = SimulatorState.WAITING_FOR_PATIENT
             self._reset()
@@ -53,7 +61,7 @@ class BackendSimulator:
             self.last_update = time.time_ns()
         elif data.FrontendStarted:
             PrintUtil.print_normally('Frontend started')
-            pass
+            self.frontend_started = True
         if data.Close:
             self.current_state = SimulatorState.DISABLED
             self._reset()
@@ -66,6 +74,7 @@ class BackendSimulator:
     def _reset(self):
         self.current_motor_state = MotorState.new(self.current_patient)
         self.current_assessment = None
+        self.logger = None
         self.start_time = time.time_ns()
         self.input_handler.finish_assessment()
 
@@ -97,7 +106,11 @@ class BackendSimulator:
         # Update the time value from motor state
         self.current_motor_state.Time = ((time.time_ns() - self.start_time) // 1_000_000) / 1000.0
 
-        # TODO log input and motor state
+        self.frontend_started = self.frontend_started and self.current_motor_state.TargetState
+        self.cycle_counter += 1
+        if self.logger is not None and self.cycle_counter >= Constants.LOG_CYCLES:
+            self.cycle_counter = 0
+            self.logger.log(self.current_motor_state, self.frontend_started, self.input_handler.current_input_state)
 
         # Wait 1ms to simulate 1kHz update frequency, accuracy of this depends on OS
         time.sleep(Constants.ROBOT_CYCLE_TIME)

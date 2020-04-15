@@ -9,7 +9,7 @@ Simply double click build.bat, which will create a standalone executable file of
 The resulting executable should then be portable, i.e. it should be able to run on any Windows system (even without a Python installation).
 
 ## Usage
-Simply start the simulator before starting the frontend and close after the frontend has terminated.
+Simply start the simulator before starting the frontend and close it after the frontend has terminated.
 
 If you are using the frontend version from [here](https://gitlab.ethz.ch/RELab/eth-mike/eth-mike-front-end/tree/debug-needle),
 you can rename the simulator executable to `UDPService.exe` and drop it into the Unity project folder (when running from Editor) or next to the ETH Mike.exe (when running standalone build).
