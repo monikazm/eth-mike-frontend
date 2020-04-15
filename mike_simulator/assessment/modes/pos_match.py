@@ -3,8 +3,9 @@ from enum import IntEnum
 from typing import Optional
 
 from mike_simulator.assessment import Assessment
-from mike_simulator.auto_movement import AutomaticMovement, MoverFactory
+from mike_simulator.auto_movement.factory import AutoMover, AutoMoverFactory
 from mike_simulator.datamodels import MotorState
+from mike_simulator.input import InputHandler
 from mike_simulator.util import PrintUtil
 
 
@@ -22,11 +23,11 @@ class PositionMatchingAssessment(Assessment):
         super().__init__(S.STANDBY)
 
         # Used for automatic movement to starting position and target position
-        self.auto_mover: Optional[AutomaticMovement] = None
+        self.auto_mover: Optional[AutoMover] = None
 
-    def on_start(self, motor_state: MotorState):
+    def on_start(self, motor_state: MotorState, input_handler: InputHandler):
         if self.in_state(S.USER_INPUT):
-            # Finish probe
+            # User confirmed selected position -> start next probe (if any)
             motor_state.TargetState = False
             if motor_state.TrialNr == 21:
                 self.goto_state(S.FINISHED)
@@ -34,13 +35,13 @@ class PositionMatchingAssessment(Assessment):
                 self.goto_state(S.STANDBY)
 
         if self.in_state(S.STANDBY):
-            # Start new probe
+            # Start new probe, instruct robot to move to starting position within 3 seconds
             motor_state.TrialNr += 1
             motor_state.StartingPosition = 30.0 if motor_state.LeftHand else -30.0
-            self.auto_mover = MoverFactory.make_linear_mover(motor_state.Position, motor_state.StartingPosition, 3.0)
+            self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.StartingPosition, 3.0)
             self.goto_state(S.MOVING_TO_START)
 
-    def on_update(self, motor_state: MotorState, directional_input: float, delta_time: float):
+    def on_update(self, motor_state: MotorState, input_handler: InputHandler):
         if self.in_state(S.MOVING_TO_START):
             # Automatic movement towards starting position
             if motor_state.move_using(self.auto_mover).has_finished():
@@ -49,10 +50,13 @@ class PositionMatchingAssessment(Assessment):
                 motor_state.TargetPosition = float(random.randint(40, 60))
                 if not motor_state.LeftHand:
                     motor_state.TargetPosition *= -1.0
-                self.auto_mover = MoverFactory.make_linear_mover(motor_state.Position, motor_state.TargetPosition, 3.0)
+
+                # Instruct robot to move to random destination within 3 seconds
+                self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.TargetPosition, 3.0)
                 self.goto_state(S.MOVING_TO_HIDDEN_DEST)
         elif self.in_state(S.MOVING_TO_HIDDEN_DEST):
-            # Automatic movement towards hidden target position
+            # Automatic movement towards random destination
             if motor_state.move_using(self.auto_mover).has_finished():
+                # Once target is reached, wait for user to enter a position in the frontend
                 motor_state.TargetState = True
                 self.goto_state(S.USER_INPUT)

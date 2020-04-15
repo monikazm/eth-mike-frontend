@@ -55,10 +55,8 @@ def main():
             data_client.sendto(ms.to_json().encode('utf-8'), DATA_DEST)
 
             if ms.Finished:
+                # Sleep for some time when assessment is finished to avoid some issues
                 time.sleep(0.2)
-
-            # Wait 1ms to simulate 1kHz update frequency, accuracy of this depends on OS
-            time.sleep(0.001)
 
 
 if __name__ == '__main__':

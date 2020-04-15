@@ -1,24 +1,4 @@
 import sys
-import time
-
-
-def get_current_time() -> float:
-    return time.time_ns() / 1_000_000_000
-
-
-class Timer:
-    def __init__(self):
-        self.end_time = None
-
-    def start(self, duration: float):
-        assert self.has_finished()
-        self.end_time = get_current_time() + duration
-
-    def is_active(self) -> bool:
-        return not self.has_finished()
-
-    def has_finished(self) -> bool:
-        return self.end_time is None or get_current_time() >= self.end_time
 
 
 class PrintUtil:
