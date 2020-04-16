@@ -1,6 +1,9 @@
+import json
 import select
 import socket
 import time
+
+from dataclasses import asdict
 
 from mike_simulator.datamodels import PatientResponse, ControlResponse
 from mike_simulator.simulator import BackendSimulator
@@ -39,12 +42,12 @@ def main():
             if sock == patient_server:
                 # Receive patient data from frontend and update simulator accordingly
                 data, _ = patient_server.recvfrom(1024)
-                data = PatientResponse.from_json(data.decode('utf-8'))
+                data = PatientResponse(**json.loads(data.decode('utf-8')))
                 simulator.update_patient_data(data)
             elif sock == control_server:
                 # Receive control signal from frontend and update simulator accordingly
                 data, _ = control_server.recvfrom(1024)
-                data = ControlResponse.from_json(data.decode('utf-8'))
+                data = ControlResponse(**json.loads(data.decode('utf-8')))
                 simulator.update_control_data(data)
         for sock in send_socks:
             assert sock == data_client
@@ -52,7 +55,7 @@ def main():
             ms = simulator.get_motor_state()
 
             # Send new motor state to frontend
-            data_client.sendto(ms.to_json().encode('utf-8'), DATA_DEST)
+            data_client.sendto(json.dumps(asdict(ms)).encode('utf-8'), DATA_DEST)
 
             if ms.Finished:
                 # Sleep for some time when assessment is finished to avoid some issues

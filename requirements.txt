@@ -1,4 +1,3 @@
 XInput-Python==0.4.0
-dataclasses-json==0.4.2
 keyboard==0.13.5
 PyInstaller==3.6

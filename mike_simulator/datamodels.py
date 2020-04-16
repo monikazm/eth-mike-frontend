@@ -2,8 +2,6 @@ import math
 from dataclasses import dataclass
 from enum import IntEnum
 
-from dataclasses_json import dataclass_json
-
 from mike_simulator.auto_movement import AutoMover
 from mike_simulator.util import PrintUtil
 
@@ -53,7 +51,6 @@ class AssessmentType(IntEnum):
     SensoriMotor = 3
 
 
-@dataclass_json
 @dataclass
 class ControlResponse:
     EmergencyStop: bool = False
@@ -63,7 +60,6 @@ class ControlResponse:
     Close: bool = False
 
 
-@dataclass_json
 @dataclass
 class PatientResponse:
     SubjectNr: str = ''
@@ -72,7 +68,6 @@ class PatientResponse:
     DateTime: str = ''
 
 
-@dataclass_json
 @dataclass
 class MotorState:
     LeftHand: bool = False

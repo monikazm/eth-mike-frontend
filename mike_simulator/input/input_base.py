@@ -26,7 +26,7 @@ class InputHandlerBase(InputHandler, metaclass=ABCMeta):
         else:
             prev_velocity = state.velocity
             state.velocity = self.get_current_velocity(state, motor_state, delta_time)
-            # Compute some dummy value for the force (F = m * a)
+            # Compute some dummy value for the force (F = m * a), TODO also include friction force
             state.force = (state.velocity - prev_velocity) * (Constants.MASS_CONSTANT / delta_time)
 
         # Cap values to reasonable range and make sure that velocity drops to 0 when boundary is reached
