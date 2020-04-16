@@ -2,16 +2,23 @@ import json
 import random
 import select
 import socket
-import time
-
+import sys
 from dataclasses import asdict
 
 from mike_simulator.config import load_configuration, cfg
 from mike_simulator.datamodels import PatientResponse, ControlResponse
 from mike_simulator.simulator import BackendSimulator
+from mike_simulator.util import PrintUtil
 
 
 def main():
+    seed = random.randrange(sys.maxsize)
+    #seed = value
+    control_loss_rng = random.Random(seed)
+    patient_loss_rng = random.Random(seed+1)
+    motor_data_loss_rng = random.Random(seed+2)
+    print(f'Packet loss rng seed: {seed}')
+
     # Load configuration file
     load_configuration()
 
@@ -37,27 +44,27 @@ def main():
             if sock == patient_server:
                 # Receive patient data from frontend and update simulator accordingly
                 data, _ = patient_server.recvfrom(1024)
-                if random.random() >= cfg.Network.patient_packet_loss_rate:
-                    data = PatientResponse(**json.loads(data.decode('utf-8')))
+                data = PatientResponse(**json.loads(data.decode('utf-8')))
+                if patient_loss_rng.random() >= cfg.Network.patient_packet_loss_rate:
                     simulator.update_patient_data(data)
+                else:
+                    PrintUtil.print_normally(f'!!! PACKAGE LOSS FOR {data} !!!')
             elif sock == control_server:
                 # Receive control signal from frontend and update simulator accordingly
                 data, _ = control_server.recvfrom(1024)
-                if random.random() >= cfg.Network.control_packet_loss_rate:
-                    data = ControlResponse(**json.loads(data.decode('utf-8')))
+                data = ControlResponse(**json.loads(data.decode('utf-8')))
+                if control_loss_rng.random() >= cfg.Network.control_packet_loss_rate:
                     simulator.update_control_data(data)
+                else:
+                    PrintUtil.print_normally(f'!!! PACKAGE LOSS FOR {data} !!!')
         for sock in send_socks:
             assert sock == data_client
             # Get updated motor state from simulator
             ms = simulator.get_motor_state()
 
             # Send new motor state to frontend
-            if random.random() >= cfg.Network.motor_data_packet_loss_rate:
+            if motor_data_loss_rng.random() >= cfg.Network.motor_data_packet_loss_rate:
                 data_client.sendto(json.dumps(asdict(ms)).encode('utf-8'), data_dest)
-
-            if ms.Finished:
-                # Sleep for some time when assessment is finished to avoid some issues
-                time.sleep(0.2)
 
 
 if __name__ == '__main__':

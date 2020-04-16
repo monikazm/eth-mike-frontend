@@ -11,18 +11,22 @@ from mike_simulator.logger import Logger
 from mike_simulator.util import PrintUtil
 
 
+class IllegalStateException(RuntimeError):
+    pass
+
+
 # Simulator states, transitions occur based on control signals
 class SimulatorState(Enum):
-    DISABLED = 0
     WAITING_FOR_PATIENT = 1
     READY = 2
     RUNNING = 3
+    FINISHED = 4
 
 
 class BackendSimulator:
     def __init__(self):
         self.current_patient: PatientResponse = PatientResponse()
-        self.current_state = SimulatorState.DISABLED
+        self.current_state = SimulatorState.WAITING_FOR_PATIENT
         self.current_assessment: Optional[Assessment] = None
         self.logger: Optional[Logger] = None
 
@@ -40,7 +44,15 @@ class BackendSimulator:
 
         self._reset()
 
+    def goto_state(self, new_state: SimulatorState):
+        self.current_state = new_state
+
+    def check_in_state(self, *states):
+        if self.current_state not in states:
+            raise IllegalStateException(f'Expected state to be in one of {states}, was {self.current_state.name}')
+
     def update_patient_data(self, data: PatientResponse):
+        self.check_in_state(SimulatorState.WAITING_FOR_PATIENT)
         PrintUtil.print_normally(f'Received {data}')
         self.current_patient = data
         self._reset()
@@ -48,26 +60,25 @@ class BackendSimulator:
         self.input_handler.begin_assessment(self.current_assessment)
         if cfg.Logging.enabled:
             self.logger = Logger(self.current_patient)
+        self.goto_state(SimulatorState.READY)
 
     def update_control_data(self, data: ControlResponse):
         PrintUtil.print_normally(f'Received {data}')
         if data.EmergencyStop:
-            self.current_state = SimulatorState.DISABLED
             self._reset()
             sys.exit(-1)
-        elif data.Restart:
-            self.current_state = SimulatorState.WAITING_FOR_PATIENT
+        elif data.Restart or data.Close:
             self._reset()
+            self.goto_state(SimulatorState.WAITING_FOR_PATIENT)
         elif data.Start:
-            self.current_state = SimulatorState.RUNNING
+            self.check_in_state(SimulatorState.READY, SimulatorState.RUNNING)
             self.current_assessment.on_start(self.current_motor_state, self.input_handler)
             self.last_update = time.time_ns()
+            self.goto_state(SimulatorState.RUNNING)
         elif data.FrontendStarted:
+            self.check_in_state(SimulatorState.RUNNING)
             PrintUtil.print_normally('Frontend started')
             self.frontend_started = True
-        if data.Close:
-            self.current_state = SimulatorState.DISABLED
-            self._reset()
 
     def get_motor_state(self) -> MotorState:
         self._update_motor_state()
@@ -102,9 +113,11 @@ class BackendSimulator:
 
             # Check if assessment is finished
             if self.current_assessment.is_finished():
+                self.check_in_state(SimulatorState.RUNNING)
                 self.input_handler.finish_assessment()
                 self.current_assessment = None
                 self.current_motor_state = MotorState.new(self.current_patient, Finished=True)
+                self.goto_state(SimulatorState.FINISHED)
 
         # Update the time value from motor state
         self.current_motor_state.Time = ((time.time_ns() - self.start_time) // 1_000_000) / 1000.0
