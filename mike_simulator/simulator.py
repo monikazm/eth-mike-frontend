@@ -3,9 +3,8 @@ import time
 from enum import Enum
 from typing import Optional
 
-import XInput as xinput
-
 from mike_simulator.assessment.factory import Assessment, AssessmentFactory
+from mike_simulator.config import cfg
 from mike_simulator.datamodels import ControlResponse, PatientResponse, MotorState, Constants
 from mike_simulator.input.factory import InputMethod, InputHandlerFactory
 from mike_simulator.logger import Logger
@@ -28,9 +27,12 @@ class BackendSimulator:
         self.logger: Optional[Logger] = None
 
         self.last_update = -1
-        if any(xinput.get_connected()):
-            self.input_handler = InputHandlerFactory.create(InputMethod.Gamepad)
-        else:
+
+        try:
+            self.input_handler = InputHandlerFactory.create(InputMethod[cfg.Input.method])
+        except Exception as e:
+            print(f'Error while setting up input method {cfg.Input.method} {e.args}. '
+                  f'Falling back to Keyboard Input...')
             self.input_handler = InputHandlerFactory.create(InputMethod.Keyboard)
 
         self.frontend_started = False
@@ -44,7 +46,8 @@ class BackendSimulator:
         self._reset()
         self.current_assessment = AssessmentFactory.create(data.AssessmentMode)
         self.input_handler.begin_assessment(self.current_assessment)
-        self.logger = Logger(self.current_patient)
+        if cfg.Logging.enabled:
+            self.logger = Logger(self.current_patient)
 
     def update_control_data(self, data: ControlResponse):
         PrintUtil.print_normally(f'Received {data}')

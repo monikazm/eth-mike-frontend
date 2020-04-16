@@ -7,6 +7,10 @@ from mike_simulator.input.input_base import InputHandlerBase
 
 
 class GamepadInputHandler(InputHandlerBase):
+    def __init__(self):
+        super().__init__()
+        if not any(xinput.get_connected()):
+            raise RuntimeError('No gamepad connected')
 
     @staticmethod
     def get_directional_input():

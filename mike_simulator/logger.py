@@ -3,6 +3,7 @@ import os
 import random
 from datetime import datetime
 
+from mike_simulator.config import cfg
 from mike_simulator.datamodels import MotorState, PatientResponse, AssessmentType
 from mike_simulator.input import InputState
 
@@ -24,7 +25,7 @@ class Logger:
 
     def __init__(self, patient: PatientResponse):
         # Create directories if needed
-        directory = os.path.join('logs',
+        directory = os.path.join(cfg.Logging.log_dir,
                                  patient.SubjectNr,
                                  Logger.TASK_NAMES[patient.AssessmentMode],
                                  f'{"Left" if patient.LeftHand else "Right"} Hand')

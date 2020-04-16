@@ -1,4 +1,5 @@
 
+simulator_config.ini
 logs/
 venv/
 *.exe
