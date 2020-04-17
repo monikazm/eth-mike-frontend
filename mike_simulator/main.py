@@ -48,7 +48,7 @@ def main():
                 if patient_loss_rng.random() >= cfg.Network.patient_packet_loss_rate:
                     simulator.update_patient_data(data)
                 else:
-                    PrintUtil.print_normally(f'!!! PACKAGE LOSS FOR {data} !!!')
+                    PrintUtil.print_normally(f'!!! PACKET LOSS FOR {data} !!!')
             elif sock == control_server:
                 # Receive control signal from frontend and update simulator accordingly
                 data, _ = control_server.recvfrom(1024)
@@ -56,7 +56,7 @@ def main():
                 if control_loss_rng.random() >= cfg.Network.control_packet_loss_rate:
                     simulator.update_control_data(data)
                 else:
-                    PrintUtil.print_normally(f'!!! PACKAGE LOSS FOR {data} !!!')
+                    PrintUtil.print_normally(f'!!! PACKET LOSS FOR {data} !!!')
         for sock in send_socks:
             assert sock == data_client
             # Get updated motor state from simulator

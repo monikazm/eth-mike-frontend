@@ -40,7 +40,7 @@ class ForceAssessment(Assessment):
 
     def on_update(self, motor_state: MotorState, input_handler: InputHandler):
         if self.in_state(S.COUNTDOWN):
-            # We are waiting for 3 sec until to start applying force
+            # We are waiting for 3 sec until the user is asked to apply force
             if self.timer.has_finished():
                 motor_state.TargetState = True
                 input_handler.reset_input()

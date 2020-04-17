@@ -47,12 +47,15 @@ class BackendSimulator:
     def goto_state(self, new_state: SimulatorState):
         self.current_state = new_state
 
-    def check_in_state(self, *states):
+    def check_in_state(self, *states) -> bool:
         if self.current_state not in states:
-            raise IllegalStateException(f'Expected state to be in one of {states}, was {self.current_state.name}')
+            print(f'!!! Illegal state: expected to be in one of {states}, was in {self.current_state.name} !!!')
+            # raise IllegalStateException(f'Expected state to be in one of {states}, was {self.current_state.name}')
+            return False
+        return True
 
     def update_patient_data(self, data: PatientResponse):
-        self.check_in_state(SimulatorState.WAITING_FOR_PATIENT)
+        #self.check_in_state(SimulatorState.WAITING_FOR_PATIENT)
         PrintUtil.print_normally(f'Received {data}')
         self.current_patient = data
         self._reset()
@@ -71,14 +74,14 @@ class BackendSimulator:
             self._reset()
             self.goto_state(SimulatorState.WAITING_FOR_PATIENT)
         elif data.Start:
-            self.check_in_state(SimulatorState.READY, SimulatorState.RUNNING)
-            self.current_assessment.on_start(self.current_motor_state, self.input_handler)
-            self.last_update = time.time_ns()
-            self.goto_state(SimulatorState.RUNNING)
+            if self.check_in_state(SimulatorState.READY, SimulatorState.RUNNING):
+                self.current_assessment.on_start(self.current_motor_state, self.input_handler)
+                self.last_update = time.time_ns()
+                self.goto_state(SimulatorState.RUNNING)
         elif data.FrontendStarted:
-            self.check_in_state(SimulatorState.RUNNING)
-            PrintUtil.print_normally('Frontend started')
-            self.frontend_started = True
+            if self.check_in_state(SimulatorState.RUNNING):
+                PrintUtil.print_normally('Frontend started')
+                self.frontend_started = True
 
     def get_motor_state(self) -> MotorState:
         self._update_motor_state()
@@ -89,6 +92,7 @@ class BackendSimulator:
         self.current_motor_state = MotorState.new(self.current_patient)
         self.current_assessment = None
         self.logger = None
+        self.cycle_counter = 0
         self.start_time = time.time_ns()
         self.input_handler.finish_assessment()
 
@@ -113,20 +117,22 @@ class BackendSimulator:
 
             # Check if assessment is finished
             if self.current_assessment.is_finished():
-                self.check_in_state(SimulatorState.RUNNING)
-                self.input_handler.finish_assessment()
-                self.current_assessment = None
-                self.current_motor_state = MotorState.new(self.current_patient, Finished=True)
-                self.goto_state(SimulatorState.FINISHED)
+                if self.check_in_state(SimulatorState.RUNNING):
+                    self.input_handler.finish_assessment()
+                    self.current_assessment = None
+                    self.current_motor_state = MotorState.new(self.current_patient, Finished=True)
+                    self.goto_state(SimulatorState.FINISHED)
 
         # Update the time value from motor state
         self.current_motor_state.Time = ((time.time_ns() - self.start_time) // 1_000_000) / 1000.0
 
         self.frontend_started = self.frontend_started and self.current_motor_state.TargetState
-        self.cycle_counter += 1
-        if self.logger is not None and self.cycle_counter >= Constants.LOG_CYCLES:
-            self.cycle_counter = 0
-            self.logger.log(self.current_motor_state, self.frontend_started, self.input_handler.current_input_state)
+
+        if self.logger is not None:
+            self.cycle_counter += 1
+            if self.cycle_counter >= Constants.LOG_CYCLES:
+                self.cycle_counter = 0
+                self.logger.log(self.current_motor_state, self.frontend_started, self.input_handler.current_input_state)
 
         # Wait 1ms to simulate 1kHz update frequency, accuracy of this depends on OS
         time.sleep(Constants.ROBOT_CYCLE_TIME)
