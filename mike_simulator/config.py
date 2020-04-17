@@ -4,7 +4,7 @@ import socket
 from configparser import ConfigParser
 from dataclasses import dataclass, asdict, fields
 
-from mike_simulator.input.factory import InputMethod
+from mike_simulator.input import InputMethod
 
 
 @dataclass
@@ -18,8 +18,12 @@ class IniSection:
     def __post_init__(self):
         # Automatic type conversion
         for field in fields(self):
-            if field.type != str and isinstance(getattr(self, field.name), str):
-                setattr(self, field.name, field.type(ast.literal_eval(getattr(self, field.name))))
+            val = getattr(self, field.name)
+            if field.type != str and isinstance(val, str):
+                try:
+                    setattr(self, field.name, field.type(ast.literal_eval(val)))
+                except Exception:
+                    raise ValueError(f'{val} could not be parsed or converted to correct type for field {field.name}')
         self.validate()
 
     def validate(self):
@@ -93,6 +97,19 @@ class Config:
                     raise ValueError(f'Network.{name} must be between 0 and 1')
     Network: NetworkSection = NetworkSection()
 
+    @dataclass
+    class AssessmentsSection(IniSection):
+        num_force_trials_per_direction: int = 3
+        num_motor_trials_per_direction: int = 10
+        num_pos_match_trials: int = 21
+        num_rom_repetitions: int = 3
+        num_sensorimotor_trials_per_phase: int = 3
+        sensorimotor_movement_duration: float = 30.0
+
+        def validate(self):
+            pass
+    Assessments: AssessmentsSection = AssessmentsSection()
+
 
 def load_configuration(filename: str = './simulator_config.ini'):
     """
@@ -121,4 +138,4 @@ def load_configuration(filename: str = './simulator_config.ini'):
 
 
 # Global configuration object
-cfg = Config()
+cfg: Config = Config()

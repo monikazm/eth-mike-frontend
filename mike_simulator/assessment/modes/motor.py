@@ -5,6 +5,7 @@ from typing import Optional
 
 from mike_simulator.assessment import Assessment
 from mike_simulator.auto_movement.factory import AutoMover, AutoMoverFactory
+from mike_simulator.config import cfg
 from mike_simulator.datamodels import MotorState
 from mike_simulator.input import InputHandler
 from mike_simulator.util import PrintUtil, Timer
@@ -24,7 +25,8 @@ class MotorAssessment(Assessment):
         super().__init__(S.STANDBY)
 
         # Compute randomized list of 20 flexion/extension phases (10 each)
-        self.phases = [True]*10 + [False]*10
+        count = cfg.Assessments.num_motor_trials_per_direction
+        self.phases = [True]*count + [False]*count
         random.shuffle(self.phases)
 
         # Maximum velocity reached within phase

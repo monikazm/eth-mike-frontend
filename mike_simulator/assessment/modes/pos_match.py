@@ -4,6 +4,7 @@ from typing import Optional
 
 from mike_simulator.assessment import Assessment
 from mike_simulator.auto_movement.factory import AutoMover, AutoMoverFactory
+from mike_simulator.config import cfg
 from mike_simulator.datamodels import MotorState
 from mike_simulator.input import InputHandler
 from mike_simulator.util import PrintUtil
@@ -29,7 +30,7 @@ class PositionMatchingAssessment(Assessment):
         if self.in_state(S.USER_INPUT):
             # User confirmed selected position -> start next probe (if any)
             motor_state.TargetState = False
-            if motor_state.TrialNr == 21:
+            if motor_state.TrialNr == cfg.Assessments.num_pos_match_trials:
                 self.goto_state(S.FINISHED)
             else:
                 self.goto_state(S.STANDBY)

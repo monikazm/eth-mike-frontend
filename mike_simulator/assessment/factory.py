@@ -3,7 +3,7 @@ from mike_simulator.assessment.modes import *
 from mike_simulator.datamodels import AssessmentType
 
 # Dict for looking up class corresponding to assessment type
-assessments_class_for_type = {
+_assessments_class_for_type = {
     AssessmentType.Force: ForceAssessment,
     AssessmentType.PositionMatching: PositionMatchingAssessment,
     AssessmentType.RangeOfMotion: RangeOfMotionAssessment,
@@ -15,4 +15,4 @@ assessments_class_for_type = {
 class AssessmentFactory:
     @staticmethod
     def create(assessment: AssessmentType) -> Assessment:
-        return assessments_class_for_type[assessment]()
+        return _assessments_class_for_type[assessment]()

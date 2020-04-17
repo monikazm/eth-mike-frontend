@@ -6,7 +6,8 @@ from typing import Optional
 from mike_simulator.assessment.factory import Assessment, AssessmentFactory
 from mike_simulator.config import cfg
 from mike_simulator.datamodels import ControlResponse, PatientResponse, MotorState, Constants
-from mike_simulator.input.factory import InputMethod, InputHandlerFactory
+from mike_simulator.input.factory import InputHandlerFactory
+from mike_simulator.input import InputMethod
 from mike_simulator.logger import Logger
 from mike_simulator.util import PrintUtil
 

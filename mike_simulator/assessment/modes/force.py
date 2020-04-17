@@ -1,6 +1,7 @@
 from enum import IntEnum
 
 from mike_simulator.assessment import Assessment
+from mike_simulator.config import cfg
 from mike_simulator.datamodels import MotorState
 from mike_simulator.input import InputHandler
 from mike_simulator.util import PrintUtil, Timer
@@ -55,7 +56,7 @@ class ForceAssessment(Assessment):
                 input_handler.reset_input()
 
                 # Wait for next probe to start
-                if self.phase_probe_num == 3:
+                if self.phase_probe_num == cfg.Assessments.num_force_trials_per_direction:
                     # Move on to extension phase or quit if this has already been the extension phase
                     if motor_state.Flexion:
                         motor_state.Flexion = False

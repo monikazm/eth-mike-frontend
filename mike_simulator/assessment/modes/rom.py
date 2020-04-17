@@ -3,6 +3,7 @@ from typing import Optional
 
 from mike_simulator.assessment import Assessment
 from mike_simulator.auto_movement.factory import AutoMover, AutoMoverFactory
+from mike_simulator.config import cfg
 from mike_simulator.datamodels import MotorState, RomState
 from mike_simulator.input import InputHandler
 from mike_simulator.util import PrintUtil
@@ -33,7 +34,7 @@ class RangeOfMotionAssessment(Assessment):
             # Finish currently active probe (disable user movement) if not in automatic passive movement phase
             motor_state.TargetState = False
             input_handler.lock_movement()
-            if motor_state.TrialNr == 3:
+            if motor_state.TrialNr == cfg.Assessments.num_rom_repetitions:
                 # Goto next phase
                 motor_state.RomState = RomState(motor_state.RomState + 1)
                 motor_state.TrialNr = 0
@@ -83,7 +84,7 @@ class RangeOfMotionAssessment(Assessment):
         elif self.in_state(S.AUTO_MOVE):
             # In automatic passive movement phase, automatically start next probe when movement is finished (if any)
             if motor_state.move_using(self.auto_mover).has_finished():
-                if motor_state.TrialNr == 3:
+                if motor_state.TrialNr == cfg.Assessments.num_rom_repetitions:
                     self.goto_state(S.FINISHED)
                 else:
                     self._start_probe(motor_state)

@@ -3,6 +3,7 @@ from typing import Optional
 
 from mike_simulator.assessment import Assessment
 from mike_simulator.auto_movement.factory import AutoMover, AutoMoverFactory
+from mike_simulator.config import cfg
 from mike_simulator.datamodels import MotorState
 from mike_simulator.input import InputHandler
 
@@ -47,7 +48,9 @@ class SensoriMotorAssessment(Assessment):
                     (amplitude, 2.0 * factor),
                     (amplitude, 4.0 * factor)
                 ]
-                self.auto_mover = AutoMoverFactory.make_sine_mover(motor_state.StartingPosition, 30.0, *sine_params)
+                self.auto_mover = AutoMoverFactory.make_sine_mover(motor_state.StartingPosition,
+                                                                   cfg.Assessments.sensorimotor_movement_duration,
+                                                                   *sine_params)
 
                 # Allow user movement
                 motor_state.TargetState = True
@@ -61,9 +64,9 @@ class SensoriMotorAssessment(Assessment):
                 motor_state.TargetState = False
 
                 # Wait for next probe to start (if any)
-                if motor_state.TrialNr == 3:
+                if motor_state.TrialNr == cfg.Assessments.num_sensorimotor_trials_per_phase:
                     self.fast_phase = True
-                elif motor_state.TrialNr == 6:
+                elif motor_state.TrialNr == cfg.Assessments.num_sensorimotor_trials_per_phase * 2:
                     self.goto_state(S.FINISHED)
                     return
                 self.goto_state(S.STANDBY)
