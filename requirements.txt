@@ -1,3 +1,4 @@
 XInput-Python==0.4.0
 keyboard==0.13.5
 PyInstaller==3.6
+netstruct==1.1.2
