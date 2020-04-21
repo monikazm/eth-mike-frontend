@@ -80,8 +80,6 @@ class Config:
         patient_port: int = 6662
 
         motor_data_packet_loss_rate: float = 0.0
-        patient_packet_loss_rate: float = 0.0
-        control_packet_loss_rate: float = 0.0
 
         def validate(self):
             try:
@@ -128,7 +126,8 @@ def load_configuration(filename: str = './simulator_config.ini'):
         for section in config.sections():
             if hasattr(Config, section):
                 section_class = type(getattr(Config, section))
-                setattr(cfg, section, section_class(**dict(config[section].items())))
+                cfg_values = {k: v for k, v in config[section].items() if hasattr(section_class, k)}
+                setattr(cfg, section, section_class(**cfg_values))
     else:
         # If no configuration file exists, create one with the default settings as specified by the Config dataclass
         os.makedirs(os.path.dirname(filename), exist_ok=True)

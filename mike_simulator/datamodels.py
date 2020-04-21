@@ -62,25 +62,25 @@ class ControlResponse:
 
 @dataclass
 class PatientResponse:
-    SubjectNr: str = ''
     LeftHand: bool = False
     AssessmentMode: AssessmentType = AssessmentType.Disabled
+    SubjectNr: str = ''
     DateTime: str = ''
 
 
 @dataclass
 class MotorState:
-    LeftHand: bool = False
     Position: float = 0.0
     StartingPosition: float = 0.0
     TargetPosition: float = 0.0
     Time: float = 0.0
+    Force: float = 0.0
     TrialNr: int = 0
+    RomState: RomState = RomState.ActiveMotion
+    LeftHand: bool = False
     TargetState: bool = False
     Finished: bool = False
     Flexion: bool = True
-    RomState: RomState = RomState.ActiveMotion
-    Force: float = 0.0
 
     @staticmethod
     def new(patient: PatientResponse, **kwargs) -> 'MotorState':

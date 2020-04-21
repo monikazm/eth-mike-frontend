@@ -17,21 +17,29 @@ format_dict = {
 T = TypeVar('T')
 
 
-def unflatten_from_string(sock: socket.socket, cls: Type[T]) -> T:
+def unflatten_from_string(sock: socket.socket, cls: Type[T], includes_size: bool) -> T:
     """
     Unflatten data following the format of LabView's "Flatten to string" vi into a corresponding dataclass instance
 
     :param sock: socket on which the (possibly variable-length) data is received
     :param cls: type of the dataclass into which data should be deserialized
+    :param includes_size: if true, the payload is preceded by a 32-bit signed big-endian integer containing the message length
     :return: dataclass instance
     """
 
     fmt, names = zip(*[(format_dict[field.type if not issubclass(field.type, IntEnum) else int], field.name) for field in fields(cls)])
-    unpacker = netstruct.obj_unpack(b''.join(fmt))
-    remain = unpacker.remaining
-    while (remain := unpacker.feed(sock.recv(remain))) != 0:
-        pass
-    vals = unpacker.result
+    fmt = b''.join(fmt)
+
+    if includes_size:
+        data = sock.recv(4)
+        sz = netstruct.unpack(b'i', data)
+        vals = netstruct.unpack(fmt, sock.recv(sz[0]))
+    else:
+        unpacker = netstruct.obj_unpack(fmt)
+        remain = unpacker.remaining
+        while (remain := unpacker.feed(sock.recv(remain))) != 0:
+            pass
+        vals = unpacker.result
     return cls(**{name: (val.decode('utf-8') if isinstance(val, bytes) else val) for name, val in zip(names, vals)})
 
 
