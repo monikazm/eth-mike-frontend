@@ -10,6 +10,7 @@ from mike_simulator.input.factory import InputHandlerFactory
 from mike_simulator.input import InputMethod
 from mike_simulator.logger import Logger
 from mike_simulator.util import PrintUtil
+from mike_simulator.util.helpers import clamp
 
 
 class IllegalStateException(RuntimeError):
@@ -140,4 +141,4 @@ class BackendSimulator:
 
     @staticmethod
     def clamp_position(pos: float):
-        return min(max(Constants.MIN_POSITION, pos), Constants.MAX_POSITION)
+        return clamp(Constants.MIN_POSITION, Constants.MAX_POSITION, pos)

@@ -77,7 +77,7 @@ class RangeOfMotionAssessment(Assessment):
                     self.goto_state(S.USER_INPUT)
         elif self.in_state(S.USER_INPUT):
             if motor_state.RomState == RomState.PassiveMotion:
-                # Record extreme values for Passive motion
+                # Record extreme values for Passive motion TODO fix bug (not relative to starting position)
                 self.p_min_motion = min(motor_state.Position, self.p_min_motion)
                 self.p_max_motion = max(motor_state.Position, self.p_max_motion)
                 PrintUtil.print_inplace(f'Current position: {motor_state.Position:.3f}°')

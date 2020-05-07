@@ -10,6 +10,9 @@ class Timer:
         assert self.has_finished()
         self.end_time = get_current_time() + duration
 
+    def stop(self):
+        self.end_time = None
+
     def is_active(self) -> bool:
         """Return whether timer is still running."""
         return not self.has_finished()
