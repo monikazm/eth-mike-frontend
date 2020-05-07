@@ -1,18 +1,23 @@
 import math
 from abc import abstractmethod, ABCMeta
+from typing import Set
 
 from mike_simulator.datamodels import MotorState, Constants
 from mike_simulator.input import InputHandler, InputState
+from mike_simulator.util import PrintUtil
+from mike_simulator.util.perturbation import Perturbation
 
 
 class InputHandlerBase(InputHandler, metaclass=ABCMeta):
     def __init__(self):
         self.assessment = None
         self.movement_locked = True
+        self.perturbations: Set[Perturbation] = set()
         self._current_input_state = InputState()
 
     def begin_assessment(self, assessment_mode):
         self.assessment = assessment_mode
+        self.perturbations.clear()
         self._current_input_state = InputState()
         self.movement_locked = True
 
@@ -26,7 +31,22 @@ class InputHandlerBase(InputHandler, metaclass=ABCMeta):
         else:
             prev_velocity = state.velocity
             state.velocity = self.get_current_velocity(state, motor_state, delta_time)
-            # Compute some dummy value for the force (F = m * a), TODO also include friction force
+
+            perturb_velocity = 0.0
+            to_remove = []
+            for perturbation in self.perturbations:
+                if perturbation.is_finished():
+                    to_remove.append(perturbation)
+                else:
+                    perturb_velocity += perturbation.get_current_perturbation_velocity(motor_state)
+            for perturb in to_remove:
+                self.perturbations.remove(perturb)
+
+            if perturb_velocity:
+                PrintUtil.print_inplace(f"Perturbation velocity: {perturb_velocity}")
+            state.velocity += perturb_velocity
+
+            # Compute some dummy value for the force (F = m * a), TODO also include friction and perturbation force
             state.force = (state.velocity - prev_velocity) * (Constants.MASS_CONSTANT / delta_time)
 
         # Cap values to reasonable range and make sure that velocity drops to 0 when boundary is reached
@@ -50,6 +70,12 @@ class InputHandlerBase(InputHandler, metaclass=ABCMeta):
     def unlock_movement(self):
         self.movement_locked = False
         self.reset_input()
+
+    def add_perturbation(self, perturbation: Perturbation):
+        self.perturbations.add(perturbation)
+
+    def remove_perturbation(self, perturbation: Perturbation):
+        self.perturbations.remove(perturbation)
 
     @abstractmethod
     def get_current_force(self, prev_input: InputState, motor_state: MotorState, delta_time: float) -> float:

@@ -2,6 +2,7 @@ from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 
 from mike_simulator.datamodels import MotorState
+from mike_simulator.util.perturbation import Perturbation
 
 
 @dataclass
@@ -47,4 +48,12 @@ class InputHandler(metaclass=ABCMeta):
     @abstractmethod
     def unlock_movement(self):
         """Allow user to move the robot"""
+        pass
+
+    @abstractmethod
+    def add_perturbation(self, perturbation: Perturbation):
+        pass
+
+    @abstractmethod
+    def remove_perturbation(self, perturbation: Perturbation):
         pass
