@@ -21,6 +21,7 @@ class Logger:
         AssessmentType.RangeOfMotion: 'Range of Motion Task',
         AssessmentType.Motor: 'Motor Task',
         AssessmentType.SensoriMotor: 'Sensorimotor Task',
+        AssessmentType.Perturbation: 'Perturbation Task'
     }
 
     def __init__(self, patient: PatientResponse):

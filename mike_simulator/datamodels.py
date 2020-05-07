@@ -49,6 +49,15 @@ class AssessmentType(IntEnum):
     PositionMatching = 4
     Motor = 2
     SensoriMotor = 3
+    Perturbation = 5
+
+
+class PerturbationPhase(IntEnum):
+    Standby = 0
+    StayingAtTarget = 1
+    RandomDelay = 2
+    Perturbation = 3
+    ReleasingForce = 4
 
 
 @dataclass
@@ -77,6 +86,7 @@ class MotorState:
     Force: float = 0.0
     TrialNr: int = 0
     RomState: RomState = RomState.ActiveMotion
+    PerturbationPhase: PerturbationPhase = PerturbationPhase.Standby
     LeftHand: bool = False
     TargetState: bool = False
     Finished: bool = False
@@ -112,6 +122,6 @@ class MotorState:
         PrintUtil.print_inplace(f'Current robot position: {self.Position:.3f}°, target position: {self.TargetPosition:.3f}°')
         return state
 
-    def is_at_position(self, position: float) -> bool:
+    def is_at_position(self, position: float, epsilon=0.0001) -> bool:
         """Check whether the robot is currently at the specified position (in [deg])."""
-        return math.fabs(position - self.Position) < 0.0001
+        return math.fabs(position - self.Position) < epsilon

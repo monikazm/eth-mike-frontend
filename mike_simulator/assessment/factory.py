@@ -9,6 +9,7 @@ _assessments_class_for_type = {
     AssessmentType.RangeOfMotion: RangeOfMotionAssessment,
     AssessmentType.Motor: MotorAssessment,
     AssessmentType.SensoriMotor: SensoriMotorAssessment,
+    AssessmentType.Perturbation: PerturbationAssessment
 }
 
 
