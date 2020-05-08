@@ -15,5 +15,5 @@ _assessments_class_for_type = {
 
 class AssessmentFactory:
     @staticmethod
-    def create(assessment: AssessmentType) -> Assessment:
-        return _assessments_class_for_type[assessment]()
+    def create(assessment: AssessmentType, patient_data) -> Assessment:
+        return _assessments_class_for_type[assessment](patient_data)

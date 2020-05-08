@@ -61,7 +61,7 @@ class BackendSimulator:
         PrintUtil.print_normally(f'Received {data}')
         self.current_patient = data
         self._reset()
-        self.current_assessment = AssessmentFactory.create(data.AssessmentMode)
+        self.current_assessment = AssessmentFactory.create(data.AssessmentMode, self.current_patient)
         self.input_handler.begin_assessment(self.current_assessment)
         if cfg.Logging.enabled:
             self.logger = Logger(self.current_patient)

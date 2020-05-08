@@ -5,7 +5,7 @@ from typing import Optional
 from mike_simulator.assessment import Assessment
 from mike_simulator.auto_movement.factory import AutoMover, AutoMoverFactory
 from mike_simulator.config import cfg
-from mike_simulator.datamodels import MotorState
+from mike_simulator.datamodels import MotorState, PatientResponse
 from mike_simulator.input import InputHandler
 from mike_simulator.util import PrintUtil
 
@@ -20,8 +20,9 @@ class S(IntEnum):
 
 
 class PositionMatchingAssessment(Assessment):
-    def __init__(self) -> None:
+    def __init__(self, patient: PatientResponse) -> None:
         super().__init__(S.STANDBY)
+        self.direction = 1.0 if patient.LeftHand else -1.0
 
         # Used for automatic movement to starting position and target position
         self.auto_mover: Optional[AutoMover] = None
@@ -38,7 +39,7 @@ class PositionMatchingAssessment(Assessment):
         if self.in_state(S.STANDBY):
             # Start new probe, instruct robot to move to starting position within 3 seconds
             motor_state.TrialNr += 1
-            motor_state.StartingPosition = 30.0 if motor_state.LeftHand else -30.0
+            motor_state.StartingPosition = 30.0 * self.direction
             self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.StartingPosition, 3.0)
             self.goto_state(S.MOVING_TO_START)
 
@@ -48,9 +49,7 @@ class PositionMatchingAssessment(Assessment):
             if motor_state.move_using(self.auto_mover).has_finished():
                 # Robot is at starting position, compute random destination
                 PrintUtil.print_normally('Reached start')
-                motor_state.TargetPosition = float(random.randint(40, 60))
-                if not motor_state.LeftHand:
-                    motor_state.TargetPosition *= -1.0
+                motor_state.TargetPosition = float(random.randint(40, 60)) * self.direction
 
                 # Instruct robot to move to random destination within 3 seconds
                 self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.TargetPosition, 3.0)
