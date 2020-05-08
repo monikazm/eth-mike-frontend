@@ -21,7 +21,7 @@ class S(IntEnum):
 
 
 class MotorAssessment(Assessment):
-    def __init__(self) -> None:
+    def __init__(self, _) -> None:
         super().__init__(S.STANDBY)
 
         # Compute randomized list of 20 flexion/extension phases (10 each)

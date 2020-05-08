@@ -17,7 +17,7 @@ class S(IntEnum):
 
 
 class ForceAssessment(Assessment):
-    def __init__(self) -> None:
+    def __init__(self, _) -> None:
         super().__init__(S.STANDBY)
 
         # The probe number within the current phase

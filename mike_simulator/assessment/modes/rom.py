@@ -19,7 +19,7 @@ class S(IntEnum):
 
 
 class RangeOfMotionAssessment(Assessment):
-    def __init__(self) -> None:
+    def __init__(self, _) -> None:
         super().__init__(S.STANDBY)
 
         # Extreme positions recorded during passive movement phase

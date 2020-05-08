@@ -4,7 +4,7 @@ from typing import Optional
 from mike_simulator.assessment import Assessment
 from mike_simulator.auto_movement.factory import AutoMover, AutoMoverFactory
 from mike_simulator.config import cfg
-from mike_simulator.datamodels import MotorState
+from mike_simulator.datamodels import MotorState, PatientResponse
 from mike_simulator.input import InputHandler
 
 
@@ -17,8 +17,9 @@ class S(IntEnum):
 
 
 class SensoriMotorAssessment(Assessment):
-    def __init__(self):
+    def __init__(self, patient: PatientResponse):
         super().__init__(S.STANDBY)
+        self.direction = 1.0 if patient.LeftHand else -1.0
 
         # Whether we are in the slow or fast phase
         self.fast_phase = False
@@ -31,7 +32,7 @@ class SensoriMotorAssessment(Assessment):
             motor_state.TrialNr += 1
 
             # Move to starting position in 3 seconds (if not already there)
-            motor_state.StartingPosition = 45.0 if motor_state.LeftHand else -45.0
+            motor_state.StartingPosition = 45.0 * self.direction
             motor_state.TargetPosition = motor_state.StartingPosition
             move_time = 0.0 if motor_state.is_at_position(motor_state.StartingPosition) else 3.0
             self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.StartingPosition, move_time)
@@ -42,7 +43,7 @@ class SensoriMotorAssessment(Assessment):
             if motor_state.move_using(self.auto_mover).has_finished():
                 # Instruct robot to move along mixture of sines for 30 seconds
                 factor = 3.0 if self.fast_phase else 1.0
-                amplitude = 15.0 if motor_state.LeftHand else -15.0
+                amplitude = 15.0 * self.direction
                 sine_params = [
                     (amplitude, 1.0 * factor),
                     (amplitude, 2.0 * factor),
