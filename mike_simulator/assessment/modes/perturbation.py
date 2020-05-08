@@ -4,11 +4,11 @@ from typing import Optional
 
 from mike_simulator.assessment import Assessment
 from mike_simulator.auto_movement.factory import AutoMover, AutoMoverFactory
-from mike_simulator.datamodels import MotorState, PerturbationPhase
+from mike_simulator.datamodels import MotorState, PerturbationPhase, PatientResponse
 from mike_simulator.input import InputHandler
 from mike_simulator.util import PrintUtil, Timer
 from mike_simulator.util.helpers import clamp
-from mike_simulator.util.perturbation import SpringPerturbation, RampPerturbation
+from mike_simulator.util.perturbation import SpringPerturbation, RampPerturbation, StepPerturbation
 
 
 class S(IntEnum):
@@ -24,38 +24,46 @@ class S(IntEnum):
 
 
 class PerturbationAssessment(Assessment):
-    def __init__(self) -> None:
+    def __init__(self, patient: PatientResponse) -> None:
         super().__init__(S.STANDBY)
+        self.direction = 1.0 if patient.LeftHand else -1.0
 
         # Used to simulate delays
         self.timer = Timer()
 
-        self.spring_perturb = None
+        # 20 trials of 4 different perturbation types in random order
+        self.all_perturbs = 5*[RampPerturbation(-15.0 * self.direction, 1.0),
+                               RampPerturbation(-30.0 * self.direction, 1.0),
+                               StepPerturbation(-9.0 * self.direction),
+                               StepPerturbation(-18.0 * self.direction)]
+        random.shuffle(self.all_perturbs)
+
         self.perturb = None
+
+        # Create spring perturbation
+        spring_v_max = -15.0 * self.direction
+        self.spring_perturb = SpringPerturbation(spring_v_max, 30.0 * self.direction, 60.0 * self.direction)
 
         # Used for automatic movement to starting position
         self.auto_mover: Optional[AutoMover] = None
 
     def on_start(self, motor_state: MotorState, input_handler: InputHandler):
         if self.in_state(S.STANDBY):
+            self.perturb = self.all_perturbs[motor_state.TrialNr]
             motor_state.TrialNr += 1
-            motor_state.StartingPosition = 30.0 if motor_state.LeftHand else -30.0
+            motor_state.StartingPosition = 30.0 * self.direction
             self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.StartingPosition, 3.0)
             self.goto_state(S.MOVING_TO_START)
 
     def on_update(self, motor_state: MotorState, input_handler: InputHandler):
-        direction = 1.0 if motor_state.LeftHand else -1.0
-
         if self.in_state(S.MOVING_TO_START):
             if motor_state.move_using(self.auto_mover).has_finished():
                 # Display target
-                motor_state.TargetPosition = 60 * direction
+                motor_state.TargetPosition = 60.0 * self.direction
                 motor_state.TargetState = True
 
                 # Add spring force in opposite direction of movement
                 input_handler.unlock_movement()
-                spring_v_max = -10.0 * direction
-                self.spring_perturb = SpringPerturbation(spring_v_max, motor_state.StartingPosition, motor_state.TargetPosition)
                 input_handler.add_perturbation(self.spring_perturb)
 
                 # Give user 10 seconds to move to target position (against the force)
@@ -89,15 +97,13 @@ class PerturbationAssessment(Assessment):
         elif self.in_state(S.RANDOM_DELAY):
             if self.timer.has_finished():
                 # After random delay has elapsed, start perturbation for 10 seconds
-                max_perturb_v = -20.0 * direction
-                self.perturb = RampPerturbation(max_perturb_v, 1.0)
                 input_handler.add_perturbation(self.perturb)
                 self.timer.start(10.0)
                 motor_state.PerturbationPhase = PerturbationPhase.Perturbation
                 self.goto_state(S.PERTURBATION)
 
         elif self.in_state(S.PERTURBATION):
-            if motor_state.Position * direction < 0.0:
+            if motor_state.Position * self.direction < 0.0:
                 # Hard Safety (stop if origin is reached)
                 self.perturb.release_perturbation(0.0)
                 self.spring_perturb.release_perturbation(0.0)
@@ -105,7 +111,7 @@ class PerturbationAssessment(Assessment):
                 return
             else:
                 # Soft safety (reduce force if below 30 deg)
-                perturb_multiplier = clamp(0.0, 1.0, (motor_state.Position * direction) / 30.0)
+                perturb_multiplier = clamp(0.0, 1.0, (motor_state.Position * self.direction) / 30.0)
                 self.perturb.set_multiplier(perturb_multiplier)
                 self.spring_perturb.set_multiplier(perturb_multiplier)
 
@@ -124,7 +130,7 @@ class PerturbationAssessment(Assessment):
                 input_handler.lock_movement()
 
                 motor_state.PerturbationPhase = PerturbationPhase.Standby
-                if motor_state.TrialNr == 10:
+                if motor_state.TrialNr == 20:
                     self.goto_state(S.FINISHED)
                 else:
                     self.goto_state(S.STANDBY)
