@@ -1,15 +1,21 @@
 from abc import ABCMeta, abstractmethod
 
 from mike_simulator.datamodels import MotorState
-from mike_simulator.util import get_current_time
+from mike_simulator.util import get_current_time, PrintUtil
 from mike_simulator.util.helpers import lerp, clamp
 
 
 class Perturbation(metaclass=ABCMeta):
-    def __init__(self):
+    def __init__(self, name: str):
         self.release_start_time = None
         self.release_duration = None
         self.multiplier = 1.0
+        self.name = name
+
+    def activate(self):
+        self.release_start_time = None
+        self.multiplier = 1.0
+        PrintUtil.print_normally(f"Activating {self.name} perturbation")
 
     def set_multiplier(self, val: float):
         self.multiplier = val
@@ -36,7 +42,7 @@ class Perturbation(metaclass=ABCMeta):
 
 class SpringPerturbation(Perturbation):
     def __init__(self, v_max: float, start_pos: float, end_pos: float):
-        super().__init__()
+        super().__init__(f'Spring({v_max})')
         self.v_max = v_max
         distance = end_pos - start_pos
         if start_pos < end_pos:
@@ -50,10 +56,14 @@ class SpringPerturbation(Perturbation):
 
 class RampPerturbation(Perturbation):
     def __init__(self, v_max: float, ramp_duration: float):
-        super().__init__()
-        self.start_time = get_current_time()
+        super().__init__(f'Ramp({v_max},{ramp_duration})')
+        self.start_time = None
         self.v_max = v_max
         self.duration = ramp_duration
+
+    def activate(self):
+        super().activate()
+        self.start_time = get_current_time()
 
     def _get_raw_perturbation_velocity(self, _) -> float:
         elapsed = get_current_time() - self.start_time
@@ -63,7 +73,7 @@ class RampPerturbation(Perturbation):
 
 class StepPerturbation(Perturbation):
     def __init__(self, v: float):
-        super().__init__()
+        super().__init__(f'Step({v})')
         self.v = v
 
     def _get_raw_perturbation_velocity(self, _) -> float:

@@ -32,18 +32,16 @@ class InputHandlerBase(InputHandler, metaclass=ABCMeta):
             prev_velocity = state.velocity
             state.velocity = self.get_current_velocity(state, motor_state, delta_time)
 
-            perturb_velocity = 0.0
-            to_remove = []
-            for perturbation in self.perturbations:
-                if perturbation.is_finished():
-                    to_remove.append(perturbation)
-                else:
-                    perturb_velocity += perturbation.get_current_perturbation_velocity(motor_state)
+            # Remove finished perturbations
+            to_remove = [perturb for perturb in self.perturbations if perturb.is_finished()]
             for perturb in to_remove:
                 self.perturbations.remove(perturb)
 
+            # Compute total perturbation velocity
+            perturb_velocity = sum(perturb.get_current_perturbation_velocity(motor_state) for perturb in self.perturbations)
             if perturb_velocity:
                 PrintUtil.print_inplace(f"Perturbation velocity: {perturb_velocity}")
+
             state.velocity += perturb_velocity
 
             # Compute some dummy value for the force (F = m * a), TODO also include friction and perturbation force
@@ -73,6 +71,7 @@ class InputHandlerBase(InputHandler, metaclass=ABCMeta):
 
     def add_perturbation(self, perturbation: Perturbation):
         self.perturbations.add(perturbation)
+        perturbation.activate()
 
     def remove_perturbation(self, perturbation: Perturbation):
         self.perturbations.remove(perturbation)
