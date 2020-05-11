@@ -93,7 +93,7 @@ class MotorState:
         """
         assert 'StartingPosition' not in kwargs
         left = patient.LeftHand
-        return MotorState(LeftHand=left, StartingPosition=(30.0 if left else -30.0), **kwargs)
+        return MotorState(LeftHand=left, **kwargs)
 
     def move_using(self, auto_mover: AutoMover) -> AutoMover.MovementState:
         """

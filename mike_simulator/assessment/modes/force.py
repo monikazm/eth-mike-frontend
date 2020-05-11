@@ -9,33 +9,35 @@ from mike_simulator.util import PrintUtil, Timer
 
 class S(IntEnum):
     STANDBY = 0
-    STANDBY_IN_PHASE = 1
-    COUNTDOWN = 2
-    USER_INPUT = 3
+    COUNTDOWN = 1
+    USER_INPUT = 2
 
     FINISHED = -1
 
 
 class ForceAssessment(Assessment):
-    def __init__(self, _) -> None:
+    def __init__(self, motor_state: MotorState, patient) -> None:
         super().__init__(S.STANDBY)
-
-        # The probe number within the current phase
-        self.phase_probe_num = 0
 
         # Used to simulate delays
         self.timer = Timer()
 
+        # Set starting position and initialize trial
+        motor_state.StartingPosition = 0.0
+        self._prepare_next_trial_or_finish(motor_state)
+
+    def _prepare_next_trial_or_finish(self, motor_state: MotorState):
+        if motor_state.TrialNr == 2 * cfg.Assessments.num_force_trials_per_direction:
+            self.goto_state(S.FINISHED)
+        else:
+            if motor_state.TrialNr == cfg.Assessments.num_force_trials_per_direction:
+                motor_state.Flexion = False
+            motor_state.TrialNr += 1
+            self.goto_state(S.STANDBY)
+
     def on_start(self, motor_state: MotorState, input_handler: InputHandler):
         if self.in_state(S.STANDBY):
-            # Start a new phase
-            self.phase_probe_num = 0
-            self.goto_state(S.STANDBY_IN_PHASE)
-
-        if self.in_state(S.STANDBY_IN_PHASE):
-            # Start a probe
-            self.phase_probe_num += 1
-            motor_state.TrialNr += 1
+            # Start a trial
             self.timer.start(3.0)
             self.goto_state(S.COUNTDOWN)
 
@@ -51,17 +53,7 @@ class ForceAssessment(Assessment):
             if self.timer.is_active():
                 PrintUtil.print_inplace(f'Current force: {motor_state.Force:.3f} N')
             else:
-                # After 3 seconds, the probe ends
+                # After 3 seconds, the trial ends
                 motor_state.TargetState = False
                 input_handler.reset_input()
-
-                # Wait for next probe to start
-                if self.phase_probe_num == cfg.Assessments.num_force_trials_per_direction:
-                    # Move on to extension phase or quit if this has already been the extension phase
-                    if motor_state.Flexion:
-                        motor_state.Flexion = False
-                        self.goto_state(S.STANDBY)
-                    else:
-                        self.goto_state(S.FINISHED)
-                else:
-                    self.goto_state(S.STANDBY_IN_PHASE)
+                self._prepare_next_trial_or_finish(motor_state)

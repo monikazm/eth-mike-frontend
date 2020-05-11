@@ -20,26 +20,37 @@ class S(IntEnum):
 
 
 class PositionMatchingAssessment(Assessment):
-    def __init__(self, patient: PatientResponse) -> None:
+    def __init__(self, motor_state: MotorState, patient: PatientResponse) -> None:
         super().__init__(S.STANDBY)
-        self.direction = 1.0 if patient.LeftHand else -1.0
+        self.direction = 1 if patient.LeftHand else -1
+
+        # Precompute random target positions
+        interval = 20.0 / cfg.Assessments.num_pos_match_trials
+        self.target_positions = [self.direction * (40.0 + i * interval) for i in range(cfg.Assessments.num_pos_match_trials)]
+        random.shuffle(self.target_positions)
 
         # Used for automatic movement to starting position and target position
         self.auto_mover: Optional[AutoMover] = None
 
+        # Set starting position and initialize trial
+        motor_state.StartingPosition = 30.0 * self.direction
+        self._prepare_next_trial_or_finish(motor_state)
+
+    def _prepare_next_trial_or_finish(self, motor_state: MotorState):
+        if motor_state.TrialNr == cfg.Assessments.num_pos_match_trials:
+            self.goto_state(S.FINISHED)
+        else:
+            motor_state.TrialNr += 1
+            self.goto_state(S.STANDBY)
+
     def on_start(self, motor_state: MotorState, input_handler: InputHandler):
         if self.in_state(S.USER_INPUT):
-            # User confirmed selected position -> start next probe (if any)
+            # User confirmed selected position -> start next trial (if any)
             motor_state.TargetState = False
-            if motor_state.TrialNr == cfg.Assessments.num_pos_match_trials:
-                self.goto_state(S.FINISHED)
-            else:
-                self.goto_state(S.STANDBY)
+            self._prepare_next_trial_or_finish(motor_state)
 
         if self.in_state(S.STANDBY):
-            # Start new probe, instruct robot to move to starting position within 3 seconds
-            motor_state.TrialNr += 1
-            motor_state.StartingPosition = 30.0 * self.direction
+            # Start new trial, instruct robot to move to starting position within 3 seconds
             self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.StartingPosition, 3.0)
             self.goto_state(S.MOVING_TO_START)
 
@@ -49,7 +60,7 @@ class PositionMatchingAssessment(Assessment):
             if motor_state.move_using(self.auto_mover).has_finished():
                 # Robot is at starting position, compute random destination
                 PrintUtil.print_normally('Reached start')
-                motor_state.TargetPosition = float(random.randint(40, 60)) * self.direction
+                motor_state.TargetPosition = self.target_positions[motor_state.TrialNr - 1]
 
                 # Instruct robot to move to random destination within 3 seconds
                 self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.TargetPosition, 3.0)

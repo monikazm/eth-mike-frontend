@@ -6,7 +6,7 @@ from typing import Optional
 from mike_simulator.assessment import Assessment
 from mike_simulator.auto_movement.factory import AutoMover, AutoMoverFactory
 from mike_simulator.config import cfg
-from mike_simulator.datamodels import MotorState
+from mike_simulator.datamodels import MotorState, PatientResponse
 from mike_simulator.input import InputHandler
 from mike_simulator.util import PrintUtil, Timer
 
@@ -21,16 +21,13 @@ class S(IntEnum):
 
 
 class MotorAssessment(Assessment):
-    def __init__(self, _) -> None:
+    def __init__(self, motor_state: MotorState, patient: PatientResponse) -> None:
         super().__init__(S.STANDBY)
 
-        # Compute randomized list of 20 flexion/extension phases (10 each)
-        count = cfg.Assessments.num_motor_trials_per_direction
-        self.phases = [True]*count + [False]*count
-        random.shuffle(self.phases)
+        self.direction = 1.0 if patient.LeftHand else -1.0
 
         # Maximum velocity reached within phase
-        self.v_max = 0
+        self.v_max = 0.0
 
         # Used to simulate delays
         self.timer = Timer()
@@ -38,21 +35,30 @@ class MotorAssessment(Assessment):
         # Used for automatic movement to starting position
         self.auto_mover: Optional[AutoMover] = None
 
+        # Compute randomized list of 20 flexion/extension phases (10 each)
+        count = cfg.Assessments.num_motor_trials_per_direction
+        self.phases = [True]*count + [False]*count
+        random.shuffle(self.phases)
+
+        # Initialize trial
+        self._prepare_next_trial_or_finish(motor_state)
+
+    def _prepare_next_trial_or_finish(self, motor_state: MotorState):
+        self.v_max = 0.0
+        if motor_state.TrialNr == len(self.phases):
+            self.goto_state(S.FINISHED)
+        else:
+            # Set start and end position according to random phase
+            if self.phases[motor_state.TrialNr]:
+                motor_state.StartingPosition = 20.0 * self.direction
+            else:
+                motor_state.StartingPosition = 60.0 * self.direction
+
+            motor_state.TrialNr += 1
+            self.goto_state(S.STANDBY)
+
     def on_start(self, motor_state: MotorState, input_handler: InputHandler):
         if self.in_state(S.STANDBY):
-            # Select random phase (either flexion or extension)
-            motor_state.Flexion = self.phases[motor_state.TrialNr]
-            motor_state.TrialNr += 1
-
-            # Set start and end position accordingly
-            if motor_state.Flexion:
-                (motor_state.StartingPosition, motor_state.TargetPosition) = (20.0, 60.0)
-            else:
-                (motor_state.StartingPosition, motor_state.TargetPosition) = (60.0, 20.0)
-            if not motor_state.LeftHand:
-                motor_state.StartingPosition *= -1.0
-                motor_state.TargetPosition *= -1.0
-
             # Direct robot to move to starting position within 3 seconds
             self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.StartingPosition, 3.0)
             self.goto_state(S.MOVING_TO_START)
@@ -68,6 +74,13 @@ class MotorAssessment(Assessment):
             if self.timer.has_finished():
                 # Allow user movement for 4 seconds
                 motor_state.TargetState = True
+
+                # TODO this should be moved into start phase in backend
+                if self.phases[motor_state.TrialNr - 1]:
+                    motor_state.TargetPosition = 60.0 * self.direction
+                else:
+                    motor_state.TargetPosition = 20.0 * self.direction
+
                 input_handler.unlock_movement()
                 self.timer.start(4.0)
                 self.goto_state(S.USER_INPUT)
@@ -79,11 +92,7 @@ class MotorAssessment(Assessment):
                 PrintUtil.print_inplace(f'Current pos: {motor_state.Position:.3f}°, '
                                         f'speed: {math.fabs(v_current):.3f} [max: {self.v_max:.3f}] °/s')
             else:
-                # Time is up, lock movement and wait for next probe to start (if any)
+                # Time is up, lock movement and wait for next trial to start (if any)
                 motor_state.TargetState = False
                 input_handler.lock_movement()
-                self.v_max = 0.0
-                if motor_state.TrialNr == len(self.phases):
-                    self.goto_state(S.FINISHED)
-                else:
-                    self.goto_state(S.STANDBY)
+                self._prepare_next_trial_or_finish(motor_state)
