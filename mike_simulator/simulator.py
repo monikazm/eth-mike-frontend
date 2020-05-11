@@ -29,6 +29,7 @@ class BackendSimulator:
     def __init__(self):
         self.current_patient: PatientResponse = PatientResponse()
         self.current_state = SimulatorState.WAITING_FOR_PATIENT
+        self.current_motor_state: Optional[MotorState] = None
         self.current_assessment: Optional[Assessment] = None
         self.logger: Optional[Logger] = None
 
@@ -42,7 +43,9 @@ class BackendSimulator:
             self.input_handler = InputHandlerFactory.create(InputMethod.Keyboard)
 
         self.frontend_started = False
+
         self.cycle_counter = 0
+        self.start_time = time.time_ns()
 
         self._reset()
 
@@ -95,7 +98,6 @@ class BackendSimulator:
         self.current_assessment = None
         self.logger = None
         self.cycle_counter = 0
-        self.start_time = time.time_ns()
         self.input_handler.finish_assessment()
 
     def _update_motor_state(self):
