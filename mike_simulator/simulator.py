@@ -29,6 +29,7 @@ class BackendSimulator:
     def __init__(self):
         self.current_patient: PatientResponse = PatientResponse()
         self.current_state = SimulatorState.WAITING_FOR_PATIENT
+        self.current_motor_state: Optional[MotorState] = None
         self.current_assessment: Optional[Assessment] = None
         self.logger: Optional[Logger] = None
 
@@ -42,7 +43,9 @@ class BackendSimulator:
             self.input_handler = InputHandlerFactory.create(InputMethod.Keyboard)
 
         self.frontend_started = False
+
         self.cycle_counter = 0
+        self.start_time = time.time_ns()
 
         self._reset()
 
@@ -61,7 +64,7 @@ class BackendSimulator:
         PrintUtil.print_normally(f'Received {data}')
         self.current_patient = data
         self._reset()
-        self.current_assessment = AssessmentFactory.create(data.AssessmentMode, self.current_patient)
+        self.current_assessment = AssessmentFactory.create(data.AssessmentMode, self.current_motor_state, self.current_patient)
         self.input_handler.begin_assessment(self.current_assessment)
         if cfg.Logging.enabled:
             self.logger = Logger(self.current_patient)
@@ -94,8 +97,6 @@ class BackendSimulator:
         self.current_motor_state = MotorState.new(self.current_patient)
         self.current_assessment = None
         self.logger = None
-        self.cycle_counter = 0
-        self.start_time = time.time_ns()
         self.input_handler.finish_assessment()
 
     def _update_motor_state(self):
@@ -125,16 +126,16 @@ class BackendSimulator:
                     self.current_motor_state = MotorState.new(self.current_patient, Finished=True)
                     self.goto_state(SimulatorState.FINISHED)
 
-        # Update the time value from motor state
-        self.current_motor_state.Time = ((time.time_ns() - self.start_time) // 1_000_000) / 1000.0
+        # Update counter
+        self.current_motor_state.Counter = self.cycle_counter
+        self.cycle_counter += 1
 
         self.frontend_started = self.frontend_started and self.current_motor_state.TargetState
 
         if self.logger is not None:
-            self.cycle_counter += 1
-            if self.cycle_counter >= Constants.LOG_CYCLES:
-                self.cycle_counter = 0
-                self.logger.log(self.current_motor_state, self.frontend_started, self.input_handler.current_input_state)
+            if self.cycle_counter % Constants.LOG_CYCLES == 0:
+                elapsed_time = ((time.time_ns() - self.start_time) // 1_000_000) / 1000.0
+                self.logger.log(elapsed_time, self.current_motor_state, self.frontend_started, self.input_handler.current_input_state)
 
         # Wait 1ms to simulate 1kHz update frequency, accuracy of this depends on OS
         time.sleep(Constants.ROBOT_CYCLE_TIME)

@@ -43,9 +43,9 @@ class Logger:
     def __del__(self):
         self.file.close()
 
-    def log(self, motor_state: MotorState, frontend_started: bool, input_state: InputState):
+    def log(self, elapsed_time: float, motor_state: MotorState, frontend_started: bool, input_state: InputState):
         row = (
-            motor_state.Time,
+            elapsed_time,
             motor_state.Position,
             motor_state.TargetPosition,
             1 if frontend_started else 0,

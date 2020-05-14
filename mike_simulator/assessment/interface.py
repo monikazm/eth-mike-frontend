@@ -35,3 +35,8 @@ class Assessment(metaclass=ABCMeta):
     def goto_state(self, state):
         """Perform an assessment state transition."""
         self.state = state
+
+    @abstractmethod
+    def _prepare_next_trial_or_finish(self, motor_state: MotorState):
+        """This should be called internally at the beginning and whenever a trial is finished"""
+        pass

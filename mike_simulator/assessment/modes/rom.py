@@ -11,16 +11,17 @@ from mike_simulator.util import PrintUtil
 
 class S(IntEnum):
     STANDBY = 0
-    MOVING_TO_START = 1
-    USER_INPUT = 2
-    AUTO_MOVE = 3
+    INSTRUCTIONS = 1
+    MOVING_TO_START = 2
+    USER_INPUT = 3
+    AUTO_MOVE = 4
 
     FINISHED = -1
 
 
 class RangeOfMotionAssessment(Assessment):
-    def __init__(self, patient: PatientResponse) -> None:
-        super().__init__(S.STANDBY)
+    def __init__(self, motor_state: MotorState, patient: PatientResponse) -> None:
+        super().__init__(S.INSTRUCTIONS)
 
         self.direction = 1.0 if patient.LeftHand else -1.0
 
@@ -31,33 +32,47 @@ class RangeOfMotionAssessment(Assessment):
         # Used for automatic movement to starting position
         self.auto_mover: Optional[AutoMover] = None
 
-    def on_start(self, motor_state: MotorState, input_handler: InputHandler):
-        if self.in_state(S.USER_INPUT):
-            # Finish currently active probe (disable user movement) if not in automatic passive movement phase
-            motor_state.TargetState = False
-            input_handler.lock_movement()
-            if motor_state.TrialNr == cfg.Assessments.num_rom_repetitions:
-                # Goto next phase
-                motor_state.RomState = RomState(motor_state.RomState + 1)
-                motor_state.TrialNr = 0
-                self.goto_state(S.STANDBY)
-                return
-            else:
-                self.goto_state(S.STANDBY)
+        # Initialize trial
+        motor_state.TrialNr = 1
+        self._prepare_next_trial_or_finish(motor_state)
 
-        if self.in_state(S.STANDBY):
-            self._start_probe(motor_state)
+    def _prepare_next_trial_or_finish(self, motor_state: MotorState):
+        if motor_state.TrialNr == cfg.Assessments.num_rom_repetitions and motor_state.RomState == RomState.AutomaticPassiveMovement:
+            self.goto_state(S.FINISHED)
+            return
 
-    def _start_probe(self, motor_state):
-        # Instruct robot to move to starting position in 3 seconds (if not already there)
-        motor_state.TrialNr += 1
+        if motor_state.TrialNr == cfg.Assessments.num_rom_repetitions:
+            motor_state.RomState = RomState(motor_state.RomState + 1)
+            motor_state.TrialNr = 1
+            self.goto_state(S.INSTRUCTIONS)
+        else:
+            if not self.in_state(S.INSTRUCTIONS):
+                # Increment trial number
+                motor_state.TrialNr += 1
+            self.goto_state(S.STANDBY)
+
+        # Compute starting position
         if motor_state.RomState == RomState.AutomaticPassiveMovement:
             motor_state.StartingPosition = (self.p_max_motion + self.p_min_motion) / 2.0
         else:
             motor_state.StartingPosition = 30.0 * self.direction
-        move_time = 0.0 if motor_state.is_at_position(motor_state.StartingPosition) else 3.0
-        self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.StartingPosition, move_time)
-        self.goto_state(S.MOVING_TO_START)
+
+    def on_start(self, motor_state: MotorState, input_handler: InputHandler):
+        if self.in_state(S.INSTRUCTIONS):
+            self._prepare_next_trial_or_finish(motor_state)
+
+        if self.in_state(S.USER_INPUT):
+            # Finish currently active trial (disable user movement) if not in automatic passive movement phase
+            motor_state.TargetState = False
+            input_handler.lock_movement()
+            self._prepare_next_trial_or_finish(motor_state)
+
+        if self.in_state(S.STANDBY):
+            # Instruct robot to move to starting position in 3 seconds (if not already there)
+            move_time = 0.0 if motor_state.is_at_position(motor_state.StartingPosition) else 3.0
+            self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.StartingPosition,
+                                                                 move_time)
+            self.goto_state(S.MOVING_TO_START)
 
     def on_update(self, motor_state: MotorState, input_handler: InputHandler):
         if self.in_state(S.MOVING_TO_START):
@@ -84,9 +99,9 @@ class RangeOfMotionAssessment(Assessment):
                 self.p_max_motion = max(motor_state.Position, self.p_max_motion)
                 PrintUtil.print_inplace(f'Current position: {motor_state.Position:.3f}°')
         elif self.in_state(S.AUTO_MOVE):
-            # In automatic passive movement phase, automatically start next probe when movement is finished (if any)
+            # In automatic passive movement phase, automatically start next trial when movement is finished (if any)
             if motor_state.move_using(self.auto_mover).has_finished():
-                if motor_state.TrialNr == cfg.Assessments.num_rom_repetitions:
-                    self.goto_state(S.FINISHED)
-                else:
-                    self._start_probe(motor_state)
+                # Automatically move on to next trial
+                self._prepare_next_trial_or_finish(motor_state)
+                if not self.in_state(S.FINISHED):
+                    self.on_start(motor_state, input_handler)

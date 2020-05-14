@@ -17,7 +17,7 @@ class S(IntEnum):
 
 
 class SensoriMotorAssessment(Assessment):
-    def __init__(self, patient: PatientResponse):
+    def __init__(self, motor_state: MotorState, patient: PatientResponse):
         super().__init__(S.STANDBY)
         self.direction = 1.0 if patient.LeftHand else -1.0
 
@@ -27,13 +27,22 @@ class SensoriMotorAssessment(Assessment):
         # Used for automatic movement to starting position
         self.auto_mover: Optional[AutoMover] = None
 
+        # Set starting position and initialize trial
+        motor_state.StartingPosition = 45.0 * self.direction
+        self._prepare_next_trial_or_finish(motor_state)
+
+    def _prepare_next_trial_or_finish(self, motor_state: MotorState):
+        if motor_state.TrialNr == cfg.Assessments.num_sensorimotor_trials_per_phase * 2:
+            self.goto_state(S.FINISHED)
+        else:
+            if motor_state.TrialNr == cfg.Assessments.num_sensorimotor_trials_per_phase:
+                self.fast_phase = True
+            motor_state.TrialNr += 1
+            self.goto_state(S.STANDBY)
+
     def on_start(self, motor_state: MotorState, input_handler: InputHandler):
         if self.in_state(S.STANDBY):
-            motor_state.TrialNr += 1
-
             # Move to starting position in 3 seconds (if not already there)
-            motor_state.StartingPosition = 45.0 * self.direction
-            motor_state.TargetPosition = motor_state.StartingPosition
             move_time = 0.0 if motor_state.is_at_position(motor_state.StartingPosition) else 3.0
             self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.StartingPosition, move_time)
             self.goto_state(S.MOVING_TO_START)
@@ -60,14 +69,7 @@ class SensoriMotorAssessment(Assessment):
                 self.goto_state(S.USER_FOLLOW)
         elif self.in_state(S.USER_FOLLOW):
             if motor_state.move_target_using(self.auto_mover).has_finished():
-                # Disable user movement after 30 seconds
+                # Disable user movement after 30 seconds and wait for next trial to start (if any)
                 input_handler.lock_movement()
                 motor_state.TargetState = False
-
-                # Wait for next probe to start (if any)
-                if motor_state.TrialNr == cfg.Assessments.num_sensorimotor_trials_per_phase:
-                    self.fast_phase = True
-                elif motor_state.TrialNr == cfg.Assessments.num_sensorimotor_trials_per_phase * 2:
-                    self.goto_state(S.FINISHED)
-                    return
-                self.goto_state(S.STANDBY)
+                self._prepare_next_trial_or_finish(motor_state)

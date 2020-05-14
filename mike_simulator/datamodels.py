@@ -6,6 +6,16 @@ from mike_simulator.auto_movement import AutoMover
 from mike_simulator.util import PrintUtil
 
 
+class UInt8(int):
+    def __new__(cls, *args, **kwargs):
+        return super(UInt8, cls).__new__(cls, *args)
+
+
+class UInt32(int):
+    def __new__(cls, *args, **kwargs):
+        return super(UInt32, cls).__new__(cls, *args)
+
+
 class Constants:
     # Log to csv every n_th cycle
     LOG_CYCLES = 3
@@ -82,9 +92,9 @@ class MotorState:
     Position: float = 0.0
     StartingPosition: float = 0.0
     TargetPosition: float = 0.0
-    Time: float = 0.0
+    Counter: UInt32 = 0
     Force: float = 0.0
-    TrialNr: int = 0
+    TrialNr: UInt8 = 0
     RomState: RomState = RomState.ActiveMotion
     PerturbationPhase: PerturbationPhase = PerturbationPhase.Standby
     LeftHand: bool = False
@@ -103,7 +113,7 @@ class MotorState:
         """
         assert 'StartingPosition' not in kwargs
         left = patient.LeftHand
-        return MotorState(LeftHand=left, StartingPosition=(30.0 if left else -30.0), **kwargs)
+        return MotorState(LeftHand=left, **kwargs)
 
     def move_using(self, auto_mover: AutoMover) -> AutoMover.MovementState:
         """
