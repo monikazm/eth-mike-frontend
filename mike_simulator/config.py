@@ -102,6 +102,7 @@ class Config:
         num_pos_match_trials: int = 21
         num_rom_repetitions: int = 3
         num_sensorimotor_trials_per_phase: int = 3
+        num_perturbation_trials_per_type: int = 5
         sensorimotor_movement_duration: float = 30.0
 
         def validate(self):

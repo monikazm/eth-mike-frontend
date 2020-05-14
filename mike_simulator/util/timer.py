@@ -10,6 +10,10 @@ class Timer:
         assert self.has_finished()
         self.end_time = get_current_time() + duration
 
+    def restart(self, duration: float):
+        self.stop()
+        self.start(duration)
+
     def stop(self):
         self.end_time = None
 

@@ -63,11 +63,11 @@ class AssessmentType(IntEnum):
 
 
 class PerturbationPhase(IntEnum):
-    Standby = 0
-    StayingAtTarget = 1
-    RandomDelay = 2
-    Perturbation = 3
-    ReleasingForce = 4
+    InitialPhase = 0
+    HoldingPhase = 1
+    PerPerturbPhase = 2
+    PerturbApplied = 3
+    ReleasePhase = 4
 
 
 @dataclass
@@ -96,7 +96,7 @@ class MotorState:
     Force: float = 0.0
     TrialNr: UInt8 = 0
     RomState: RomState = RomState.ActiveMotion
-    PerturbationPhase: PerturbationPhase = PerturbationPhase.Standby
+    PerturbationPhase: PerturbationPhase = PerturbationPhase.InitialPhase
     LeftHand: bool = False
     TargetState: bool = False
     Finished: bool = False
