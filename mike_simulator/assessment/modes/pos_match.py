@@ -4,7 +4,6 @@ from typing import Optional
 
 from mike_simulator.assessment import Assessment
 from mike_simulator.auto_movement.factory import AutoMover, AutoMoverFactory
-from mike_simulator.config import cfg
 from mike_simulator.datamodels import MotorState, PatientResponse
 from mike_simulator.input import InputHandler
 from mike_simulator.util import PrintUtil
@@ -24,9 +23,11 @@ class PositionMatchingAssessment(Assessment):
         super().__init__(S.STANDBY)
         self.direction = 1 if patient.LeftHand else -1
 
+        self.trial_count = patient.PhaseTrialCount
+
         # Precompute random target positions
-        interval = 20.0 / cfg.Assessments.num_pos_match_trials
-        self.target_positions = [self.direction * (40.0 + i * interval) for i in range(cfg.Assessments.num_pos_match_trials)]
+        interval = 20.0 / float(self.trial_count)
+        self.target_positions = [self.direction * (40.0 + i * interval) for i in range(self.trial_count)]
         random.shuffle(self.target_positions)
 
         # Used for automatic movement to starting position and target position
@@ -37,7 +38,7 @@ class PositionMatchingAssessment(Assessment):
         self._prepare_next_trial_or_finish(motor_state)
 
     def _prepare_next_trial_or_finish(self, motor_state: MotorState):
-        if motor_state.TrialNr == cfg.Assessments.num_pos_match_trials:
+        if motor_state.TrialNr == self.trial_count:
             self.goto_state(S.FINISHED)
         else:
             motor_state.TrialNr += 1

@@ -97,11 +97,6 @@ class Config:
 
     @dataclass
     class AssessmentsSection(IniSection):
-        num_force_trials_per_direction: int = 3
-        num_motor_trials_per_direction: int = 10
-        num_pos_match_trials: int = 21
-        num_rom_repetitions: int = 3
-        num_sensorimotor_trials_per_phase: int = 3
         sensorimotor_movement_duration: float = 30.0
 
         def validate(self):

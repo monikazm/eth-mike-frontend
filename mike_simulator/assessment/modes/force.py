@@ -1,8 +1,7 @@
 from enum import IntEnum
 
 from mike_simulator.assessment import Assessment
-from mike_simulator.config import cfg
-from mike_simulator.datamodels import MotorState
+from mike_simulator.datamodels import MotorState, PatientResponse
 from mike_simulator.input import InputHandler
 from mike_simulator.util import PrintUtil, Timer
 
@@ -16,7 +15,7 @@ class S(IntEnum):
 
 
 class ForceAssessment(Assessment):
-    def __init__(self, motor_state: MotorState, patient) -> None:
+    def __init__(self, motor_state: MotorState, patient: PatientResponse) -> None:
         super().__init__(S.STANDBY)
 
         # Used to simulate delays
@@ -26,11 +25,13 @@ class ForceAssessment(Assessment):
         motor_state.StartingPosition = 0.0
         self._prepare_next_trial_or_finish(motor_state)
 
+        self.phase_trial_count = patient.PhaseTrialCount
+
     def _prepare_next_trial_or_finish(self, motor_state: MotorState):
-        if motor_state.TrialNr == 2 * cfg.Assessments.num_force_trials_per_direction:
+        if motor_state.TrialNr == 2 * self.phase_trial_count:
             self.goto_state(S.FINISHED)
         else:
-            if motor_state.TrialNr == cfg.Assessments.num_force_trials_per_direction:
+            if motor_state.TrialNr == self.phase_trial_count:
                 motor_state.Flexion = False
             motor_state.TrialNr += 1
             self.goto_state(S.STANDBY)

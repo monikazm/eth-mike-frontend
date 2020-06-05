@@ -24,6 +24,8 @@ class SensoriMotorAssessment(Assessment):
         # Whether we are in the slow or fast phase
         self.fast_phase = False
 
+        self.phase_trial_count = patient.PhaseTrialCount
+
         # Used for automatic movement to starting position
         self.auto_mover: Optional[AutoMover] = None
 
@@ -32,10 +34,10 @@ class SensoriMotorAssessment(Assessment):
         self._prepare_next_trial_or_finish(motor_state)
 
     def _prepare_next_trial_or_finish(self, motor_state: MotorState):
-        if motor_state.TrialNr == cfg.Assessments.num_sensorimotor_trials_per_phase * 2:
+        if motor_state.TrialNr == self.phase_trial_count * 2:
             self.goto_state(S.FINISHED)
         else:
-            if motor_state.TrialNr == cfg.Assessments.num_sensorimotor_trials_per_phase:
+            if motor_state.TrialNr == self.phase_trial_count:
                 self.fast_phase = True
             motor_state.TrialNr += 1
             self.goto_state(S.STANDBY)

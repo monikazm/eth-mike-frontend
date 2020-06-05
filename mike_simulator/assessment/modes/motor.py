@@ -5,7 +5,6 @@ from typing import Optional
 
 from mike_simulator.assessment import Assessment
 from mike_simulator.auto_movement.factory import AutoMover, AutoMoverFactory
-from mike_simulator.config import cfg
 from mike_simulator.datamodels import MotorState, PatientResponse
 from mike_simulator.input import InputHandler
 from mike_simulator.util import PrintUtil, Timer
@@ -36,7 +35,7 @@ class MotorAssessment(Assessment):
         self.auto_mover: Optional[AutoMover] = None
 
         # Compute randomized list of 20 flexion/extension phases (10 each)
-        count = cfg.Assessments.num_motor_trials_per_direction
+        count = patient.PhaseTrialCount
         self.phases = [True]*count + [False]*count
         random.shuffle(self.phases)
 

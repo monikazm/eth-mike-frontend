@@ -3,7 +3,6 @@ from typing import Optional
 
 from mike_simulator.assessment import Assessment
 from mike_simulator.auto_movement.factory import AutoMover, AutoMoverFactory
-from mike_simulator.config import cfg
 from mike_simulator.datamodels import MotorState, RomState, PatientResponse
 from mike_simulator.input import InputHandler
 from mike_simulator.util import PrintUtil
@@ -25,6 +24,8 @@ class RangeOfMotionAssessment(Assessment):
 
         self.direction = 1.0 if patient.LeftHand else -1.0
 
+        self.phase_trial_count = patient.PhaseTrialCount
+
         # Extreme positions recorded during passive movement phase
         self.p_min_motion = 30.0 * self.direction
         self.p_max_motion = self.p_min_motion
@@ -37,11 +38,11 @@ class RangeOfMotionAssessment(Assessment):
         self._prepare_next_trial_or_finish(motor_state)
 
     def _prepare_next_trial_or_finish(self, motor_state: MotorState):
-        if motor_state.TrialNr == cfg.Assessments.num_rom_repetitions and motor_state.RomState == RomState.AutomaticPassiveMovement:
+        if motor_state.TrialNr == self.phase_trial_count and motor_state.RomState == RomState.AutomaticPassiveMovement:
             self.goto_state(S.FINISHED)
             return
 
-        if motor_state.TrialNr == cfg.Assessments.num_rom_repetitions:
+        if motor_state.TrialNr == self.phase_trial_count:
             motor_state.RomState = RomState(motor_state.RomState + 1)
             motor_state.TrialNr = 1
             self.goto_state(S.INSTRUCTIONS)

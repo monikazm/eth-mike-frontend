@@ -81,6 +81,7 @@ class PatientResponse:
     AssessmentMode: AssessmentType = AssessmentType.Disabled
     SubjectNr: str = ''
     DateTime: str = ''
+    PhaseTrialCount: Int32 = 0
 
 
 @dataclass
