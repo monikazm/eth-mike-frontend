@@ -16,6 +16,11 @@ class UInt32(int):
         return super(UInt32, cls).__new__(cls, *args)
 
 
+class Int32(int):
+    def __new__(cls, *args, **kwargs):
+        return super(Int32, cls).__new__(cls, *args)
+
+
 class Constants:
     # Log to csv every n_th cycle
     LOG_CYCLES = 3
@@ -80,11 +85,13 @@ class PatientResponse:
 
 @dataclass
 class MotorState:
+    Counter: UInt32 = 0
+    Time: float = 0.0
     Position: float = 0.0
     StartingPosition: float = 0.0
     TargetPosition: float = 0.0
-    Counter: UInt32 = 0
     Force: float = 0.0
+    Velocity: float = 0.0
     TrialNr: UInt8 = 0
     RomState: RomState = RomState.ActiveMotion
     LeftHand: bool = False

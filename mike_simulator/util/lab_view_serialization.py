@@ -1,7 +1,7 @@
 from dataclasses import fields
 from enum import IntEnum
 from typing import TypeVar, Type
-from mike_simulator.datamodels import UInt8, UInt32
+from mike_simulator.datamodels import UInt8, UInt32, Int32
 
 import netstruct
 
@@ -13,6 +13,7 @@ format_dict = {
     float: b'f',
     UInt8: b'B',
     UInt32: b'I',
+    Int32: b'i',
     str: b'i$'
 }
 

@@ -112,6 +112,7 @@ class BackendSimulator:
         input_state = self.input_handler.current_input_state
         pos = self.current_motor_state.Position
         self.current_motor_state.Force = input_state.force
+        self.current_motor_state.Velocity = input_state.velocity
         self.current_motor_state.Position = self.clamp_position(pos + input_state.velocity * delta_time)
 
         # Update assessment state (if any)
@@ -127,14 +128,15 @@ class BackendSimulator:
                     self.goto_state(SimulatorState.FINISHED)
 
         # Update counter
+        elapsed_time = ((time.time_ns() - self.start_time) // 1_000_000) / 1000.0
         self.current_motor_state.Counter = self.cycle_counter
+        self.current_motor_state.Time = elapsed_time
         self.cycle_counter += 1
 
         self.frontend_started = self.frontend_started and self.current_motor_state.TargetState
 
         if self.logger is not None:
             if self.cycle_counter % Constants.LOG_CYCLES == 0:
-                elapsed_time = ((time.time_ns() - self.start_time) // 1_000_000) / 1000.0
                 self.logger.log(elapsed_time, self.current_motor_state, self.frontend_started, self.input_handler.current_input_state)
 
         # Wait 1ms to simulate 1kHz update frequency, accuracy of this depends on OS
