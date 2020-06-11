@@ -38,18 +38,20 @@ class RangeOfMotionAssessment(Assessment):
         self._prepare_next_trial_or_finish(motor_state)
 
     def _prepare_next_trial_or_finish(self, motor_state: MotorState):
-        if motor_state.TrialNr == self.phase_trial_count and motor_state.RomState == RomState.AutomaticPassiveMovement:
-            self.goto_state(S.FINISHED)
-            return
+        if not self.in_state(S.INSTRUCTIONS):
+            if motor_state.TrialNr == self.phase_trial_count and motor_state.RomState == RomState.AutomaticPassiveMovement:
+                self.goto_state(S.FINISHED)
+                return
 
-        if motor_state.TrialNr == self.phase_trial_count:
-            motor_state.RomState = RomState(motor_state.RomState + 1)
-            motor_state.TrialNr = 1
-            self.goto_state(S.INSTRUCTIONS)
-        else:
-            if not self.in_state(S.INSTRUCTIONS):
+            if motor_state.TrialNr == self.phase_trial_count:
+                motor_state.RomState = RomState(motor_state.RomState + 1)
+                motor_state.TrialNr = 1
+                self.goto_state(S.INSTRUCTIONS)
+            else:
                 # Increment trial number
                 motor_state.TrialNr += 1
+                self.goto_state(S.STANDBY)
+        else:
             self.goto_state(S.STANDBY)
 
         # Compute starting position

@@ -21,11 +21,11 @@ class ForceAssessment(Assessment):
         # Used to simulate delays
         self.timer = Timer()
 
+        self.phase_trial_count = patient.PhaseTrialCount
+
         # Set starting position and initialize trial
         motor_state.StartingPosition = 0.0
         self._prepare_next_trial_or_finish(motor_state)
-
-        self.phase_trial_count = patient.PhaseTrialCount
 
     def _prepare_next_trial_or_finish(self, motor_state: MotorState):
         if motor_state.TrialNr == 2 * self.phase_trial_count:
