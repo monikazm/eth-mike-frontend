@@ -128,7 +128,7 @@ class BackendSimulator:
                     self.goto_state(SimulatorState.FINISHED)
 
         # Update counter
-        elapsed_time = ((time.time_ns() - self.start_time) // 1_000_000) / 1000.0
+        elapsed_time = (time.time_ns() - self.start_time) / 1_000_000_000
         self.current_motor_state.Counter = self.cycle_counter
         self.current_motor_state.Time = elapsed_time
         self.cycle_counter += 1
