@@ -26,7 +26,7 @@ class PositionMatchingAssessment(Assessment):
         self.trial_count = patient.PhaseTrialCount
 
         # Precompute random target positions
-        interval = 20.0 / float(self.trial_count)
+        interval = 20.0 / float(self.trial_count - 1)
         self.target_positions = [self.direction * (40.0 + i * interval) for i in range(self.trial_count)]
         random.shuffle(self.target_positions)
 
