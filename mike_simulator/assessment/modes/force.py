@@ -39,7 +39,7 @@ class ForceAssessment(Assessment):
     def on_start(self, motor_state: MotorState, input_handler: InputHandler):
         if self.in_state(S.STANDBY):
             # Start a trial
-            self.timer.start(3.0)
+            self.timer.start(2.0)
             self.goto_state(S.COUNTDOWN)
 
     def on_update(self, motor_state: MotorState, input_handler: InputHandler):
