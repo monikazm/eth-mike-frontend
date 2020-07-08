@@ -26,6 +26,7 @@ class Logger:
     def __init__(self, patient: PatientResponse):
         # Create directories if needed
         directory = os.path.join(cfg.Logging.log_dir,
+                                 cfg.Logging.data_dir,
                                  patient.SubjectNr,
                                  Logger.TASK_NAMES[patient.AssessmentMode],
                                  f'{"Left" if patient.LeftHand else "Right"} Hand')

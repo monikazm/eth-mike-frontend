@@ -62,6 +62,7 @@ class Config:
     class LoggingSection(IniSection):
         enabled: bool = True
         log_dir: str = './logs'
+        data_dir: str = os.path.join('media', 'sda1', 'KSA Longitudinal Study')
 
         def validate(self):
             pass
@@ -80,6 +81,8 @@ class Config:
         patient_port: int = 6662
 
         motor_data_packet_loss_rate: float = 0.0
+
+        simulate_ftp_server: bool = False
 
         def validate(self):
             try:
