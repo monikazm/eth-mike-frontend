@@ -45,6 +45,12 @@ class RangeOfMotionAssessment(Assessment):
 
             if motor_state.TrialNr == self.phase_trial_count:
                 motor_state.RomState = RomState(motor_state.RomState + 1)
+                if motor_state.RomState == RomState.AutomaticPassiveMovement:
+                    if self.direction > 0:
+                        self.p_max_motion = min(self.p_max_motion, 80)
+                    else:
+                        self.p_min_motion = max(self.p_min_motion, -80)
+
                 motor_state.TrialNr = 1
                 self.goto_state(S.INSTRUCTIONS)
             else:

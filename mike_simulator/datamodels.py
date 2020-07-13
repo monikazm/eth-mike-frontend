@@ -29,8 +29,8 @@ class Constants:
     ROBOT_CYCLE_TIME = 0.001
 
     # Robot movement bounds [deg]
-    MIN_POSITION = -90.0
-    MAX_POSITION = 90.0
+    MIN_POSITION = -115.0
+    MAX_POSITION = 115.0
 
     # Constant to derive force from acceleration [kg]
     MASS_CONSTANT = 0.3
