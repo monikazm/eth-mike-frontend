@@ -72,7 +72,8 @@ class RangeOfMotionAssessment(Assessment):
 
         if self.in_state(S.STANDBY):
             # Instruct robot to move to starting position in 3 seconds
-            self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.StartingPosition, 3.0)
+            move_time = 0.0 if motor_state.RomState == RomState.AutomaticPassiveMovement and motor_state.TrialNr > 1 else 3.0
+            self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.StartingPosition, move_time)
             self.goto_state(S.MOVING_TO_START)
 
     def on_update(self, motor_state: MotorState, input_handler: InputHandler):
