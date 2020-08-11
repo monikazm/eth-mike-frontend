@@ -50,8 +50,10 @@ class MotorAssessment(Assessment):
             # Set start and end position according to random phase
             if self.phases[motor_state.TrialNr]:
                 motor_state.StartingPosition = 20.0 * self.direction
+                motor_state.TargetPosition = 60.0 * self.direction
             else:
                 motor_state.StartingPosition = 60.0 * self.direction
+                motor_state.TargetPosition = 20.0 * self.direction
 
             motor_state.TrialNr += 1
             self.goto_state(S.STANDBY)
@@ -73,13 +75,6 @@ class MotorAssessment(Assessment):
             if self.timer.has_finished():
                 # Allow user movement for 4 seconds
                 motor_state.TargetState = True
-
-                # TODO this should be moved into start phase in backend
-                if self.phases[motor_state.TrialNr - 1]:
-                    motor_state.TargetPosition = 60.0 * self.direction
-                else:
-                    motor_state.TargetPosition = 20.0 * self.direction
-
                 input_handler.unlock_movement()
                 self.timer.start(4.0)
                 self.goto_state(S.USER_INPUT)
