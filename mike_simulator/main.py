@@ -14,11 +14,12 @@ from mike_simulator.server import MikeServer
 
 
 def start_ftp(log_dir):
+    load_configuration()
     authorizer = DummyAuthorizer()
     authorizer.add_anonymous(os.path.realpath(log_dir))
     handler = FTPHandler
     handler.authorizer = authorizer
-    server = FTPServer(("127.0.0.1", 21), handler)
+    server = FTPServer((cfg.Network.server_bind_ip, 21), handler)
     server.serve_forever()
 
 

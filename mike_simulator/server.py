@@ -33,7 +33,7 @@ class MikeServer:
         self.data_client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         # Frontend endpoint
-        self.data_dest_endpoint = (cfg.Network.frontend_ip, cfg.Network.motor_data_port)
+        self.data_dest_endpoint = ('0.0.0.0', cfg.Network.motor_data_port)
 
         # Socket used to accept tcp connections
         self.server_socket: Optional[socket.socket] = None
@@ -55,7 +55,8 @@ class MikeServer:
     def wait_for_connection(self):
         print('Servers and client started, waiting for frontend to connect...')
         # Wait until frontend connects
-        self.connection, _ = self.server_socket.accept()
+        self.connection, (host_addr, port) = self.server_socket.accept()
+        self.data_dest_endpoint = (host_addr, cfg.Network.motor_data_port)
         print('Frontend connected')
 
     def main_loop(self):

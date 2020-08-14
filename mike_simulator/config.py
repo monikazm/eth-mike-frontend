@@ -71,7 +71,6 @@ class Config:
     @dataclass
     class NetworkSection(IniSection):
         server_bind_ip: str = '127.0.0.1'
-        frontend_ip: str = '127.0.0.1'
 
         # Address at which the frontend is listening for the updated motor state
         motor_data_port: int = 6661
@@ -87,7 +86,6 @@ class Config:
         def validate(self):
             try:
                 socket.inet_aton(self.server_bind_ip)
-                socket.inet_aton(self.frontend_ip)
             except socket.error:
                 raise ValueError('Not a valid ip address')
 

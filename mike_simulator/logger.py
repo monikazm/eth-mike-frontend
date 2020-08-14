@@ -33,8 +33,7 @@ class Logger:
         os.makedirs(directory, exist_ok=True)
 
         # Create log file
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.file = open(os.path.join(directory, f'{timestamp}.csv'), 'w', buffering=1, newline='')
+        self.file = open(os.path.join(directory, f'{patient.DateTime}.csv'), 'w', buffering=1, newline='')
 
         # Open csv writer for log file
         self.writer = csv.writer(self.file)
