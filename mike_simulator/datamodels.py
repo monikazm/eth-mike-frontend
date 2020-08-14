@@ -59,11 +59,12 @@ class RomState(IntEnum):
 
 class AssessmentType(IntEnum):
     Disabled = -1
-    Force = 1
     RangeOfMotion = 0
-    PositionMatching = 4
+    Force = 1
     Motor = 2
-    SensoriMotor = 3
+    SensoriMotor = 3,
+    PositionMatching = 4
+    PreciseReaching = 5
 
 
 @dataclass
