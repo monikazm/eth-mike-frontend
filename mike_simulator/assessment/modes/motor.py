@@ -48,11 +48,11 @@ class MotorAssessment(Assessment):
         else:
             # Set start and end position according to random phase
             if self.phases[motor_state.TrialNr]:
-                motor_state.StartingPosition = 20.0 * self.direction
-                motor_state.TargetPosition = 60.0 * self.direction
+                motor_state.StartingPosition = 30.0 * self.direction
+                motor_state.TargetPosition = 70.0 * self.direction
             else:
-                motor_state.StartingPosition = 60.0 * self.direction
-                motor_state.TargetPosition = 20.0 * self.direction
+                motor_state.StartingPosition = 70.0 * self.direction
+                motor_state.TargetPosition = 30.0 * self.direction
 
             motor_state.TrialNr += 1
             self.goto_state(S.STANDBY)
