@@ -88,6 +88,10 @@ class BackendSimulator:
                 PrintUtil.print_normally('Frontend started')
                 self.frontend_started = True
 
+    def handle_skip(self):
+        if self.check_in_state(SimulatorState.READY, SimulatorState.RUNNING):
+            self.current_assessment.on_skip(self.current_motor_state)
+
     def get_motor_state(self) -> MotorState:
         self._update_motor_state()
         #print(f'Sending {self.current_motor_state}')

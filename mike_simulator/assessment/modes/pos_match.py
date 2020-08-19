@@ -72,3 +72,10 @@ class PositionMatchingAssessment(Assessment):
                 # Once target is reached, wait for user to enter a position in the frontend
                 motor_state.TargetState = True
                 self.goto_state(S.USER_INPUT)
+
+    # Uncomment to support skipping for position matching
+    # def on_skip(self, motor_state: MotorState):
+    #     if self.in_state(S.MOVING_TO_HIDDEN_DEST) or self.in_state(S.USER_INPUT):
+    #         if motor_state.TrialNr > 1:
+    #             motor_state.TrialNr = self.trial_count + 1
+    #             self.goto_state(S.FINISHED)

@@ -74,3 +74,13 @@ class SensoriMotorAssessment(Assessment):
                 input_handler.lock_movement()
                 motor_state.TargetState = False
                 self._prepare_next_trial_or_finish(motor_state)
+
+    def on_skip(self, motor_state: MotorState):
+        if self.in_state(S.STANDBY):
+            firstTrialOfPhase = motor_state.TrialNr % self.phase_trial_count == 1
+            afterFirstInLastPhase = motor_state.TrialNr > self.phase_trial_count + 1
+            if not (firstTrialOfPhase or afterFirstInLastPhase):
+                motor_state.TrialNr = self.phase_trial_count
+                self._prepare_next_trial_or_finish(motor_state)
+            if afterFirstInLastPhase:
+                self.goto_state(S.FINISHED)

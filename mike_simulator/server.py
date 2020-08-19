@@ -17,6 +17,7 @@ class MsgType(IntEnum):
     Invalid = 0
     PatientSelect = 1
     Control = 2
+    Skip = 3
 
 
 @dataclass
@@ -82,6 +83,9 @@ class MikeServer:
                         data = unflatten_from_string(data, ControlResponse)
                         self.connection.send('X'.encode('utf-8'))
                         self.simulator.update_control_data(data)
+                    elif header.type == MsgType.Skip:
+                        self.connection.send('X'.encode('utf-8'))
+                        self.simulator.handle_skip()
                     else:
                         raise NotImplementedError(f'Message type {header.type} is currently not handled.')
 

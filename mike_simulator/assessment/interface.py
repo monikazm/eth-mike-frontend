@@ -22,6 +22,10 @@ class Assessment(metaclass=ABCMeta):
         """Should be called regularly to update the motor state."""
         pass
 
+    def on_skip(self, motor_state: MotorState):
+        """Called when the backend receives a skip signal"""
+        pass
+
     # Helper Functionality
 
     def is_finished(self) -> bool:

@@ -83,6 +83,7 @@ class PatientResponse:
     SubjectNr: str = ''
     DateTime: str = ''
     PhaseTrialCount: Int32 = 0
+    StudyName: str = ''
 
 
 @dataclass

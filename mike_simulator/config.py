@@ -62,7 +62,7 @@ class Config:
     class LoggingSection(IniSection):
         enabled: bool = True
         log_dir: str = './logs'
-        data_dir: str = os.path.join('media', 'sda1', 'KSA Longitudinal Study')
+        data_root_dir: str = os.path.join('media', 'sda1')
 
         def validate(self):
             pass
