@@ -87,7 +87,8 @@ class MikeServer:
                         self.connection.send('X'.encode('utf-8'))
                         self.simulator.handle_skip()
                     else:
-                        raise NotImplementedError(f'Message type {header.type} is currently not handled.')
+                        print(f'ERROR: Message type {header.type} is currently not handled.')
+                        self.connection.send('?'.encode('utf-8'))
 
                 for sock in send_socks:
                     assert sock == self.data_client_socket
