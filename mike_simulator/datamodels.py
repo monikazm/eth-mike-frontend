@@ -94,26 +94,22 @@ class MotorState:
     StartingPosition: float = 0.0
     TargetPosition: float = 0.0
     Force: float = 0.0
-    Velocity: float = 0.0
     TrialNr: UInt8 = 0
     RomState: RomState = RomState.ActiveMotion
-    LeftHand: bool = False
     TargetState: bool = False
     Finished: bool = False
     Flexion: bool = True
 
     @staticmethod
-    def new(patient: PatientResponse, **kwargs) -> 'MotorState':
+    def new(**kwargs) -> 'MotorState':
         """
         Initialize a new MotorState for the given patient information.
 
-        :param patient: patient information to use for the new motor state
         :param kwargs: used to specify values of additional MotorState fields
         :return: new motor state instance
         """
         assert 'StartingPosition' not in kwargs
-        left = patient.LeftHand
-        return MotorState(LeftHand=left, **kwargs)
+        return MotorState(**kwargs)
 
     def move_using(self, auto_mover: AutoMover) -> AutoMover.MovementState:
         """

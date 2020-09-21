@@ -89,9 +89,7 @@ class RangeOfMotionAssessment(Assessment):
                 if motor_state.RomState == RomState.AutomaticPassiveMovement:
                     # In automatic passive movement phase, instruct robot to move along sine
                     # with parameters based on passive movement phase for 2 seconds
-                    amplitude = (self.p_max_motion - self.p_min_motion) / 2.0
-                    if not motor_state.LeftHand:
-                        amplitude = -amplitude
+                    amplitude = ((self.p_max_motion - self.p_min_motion) / 2.0) * self.direction
                     freq = 1.0
                     self.auto_mover = AutoMoverFactory.make_sine_mover(motor_state.Position, 2.0, (amplitude, freq))
                     self.goto_state(S.AUTO_MOVE)

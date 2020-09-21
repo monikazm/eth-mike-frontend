@@ -98,7 +98,7 @@ class BackendSimulator:
         return self.current_motor_state
 
     def _reset(self):
-        self.current_motor_state = MotorState.new(self.current_patient)
+        self.current_motor_state = MotorState.new()
         self.current_assessment = None
         self.logger = None
         self.input_handler.finish_assessment()
@@ -116,7 +116,6 @@ class BackendSimulator:
         input_state = self.input_handler.current_input_state
         pos = self.current_motor_state.Position
         self.current_motor_state.Force = input_state.force
-        self.current_motor_state.Velocity = input_state.velocity
         self.current_motor_state.Position = self.clamp_position(pos + input_state.velocity * delta_time)
 
         # Update assessment state (if any)
@@ -128,7 +127,7 @@ class BackendSimulator:
                 if self.check_in_state(SimulatorState.RUNNING):
                     self.input_handler.finish_assessment()
                     self.current_assessment = None
-                    self.current_motor_state = MotorState.new(self.current_patient, Finished=True)
+                    self.current_motor_state = MotorState.new(Finished=True)
                     self.goto_state(SimulatorState.FINISHED)
 
         # Update counter

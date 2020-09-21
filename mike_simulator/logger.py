@@ -11,7 +11,7 @@ from mike_simulator.input import InputState
 class Logger:
     FIELDS = (
         'Time [s]', 'Position [deg]', 'Target Position [deg]', 'Frontend Started', 'Trial Nr', 'Velocity [deg/s]',
-        'Current [A]', 'Starting position [deg]', 'Left Hand? ', 'Voltage force [V]', 'Force [N]', 'Force filtered [N]',
+        'Current [A]', 'Starting position [deg]', 'Voltage force [V]', 'Force [N]', 'Force filtered [N]',
         'Velocity unfiltered', 'ROM State 0-Active 1-Passive 2-Automatic,Acceleration'
     )
 
@@ -54,7 +54,6 @@ class Logger:
             input_state.velocity, # filtered velocity, for now == unfiltered
             'nan', # Current
             motor_state.StartingPosition,
-            1 if motor_state.LeftHand else 0,
             input_state.force / 10 + random.gauss(0.0, 0.1), # Voltage force
             input_state.force,
             input_state.force, # filtered force, for now == unfiltered
