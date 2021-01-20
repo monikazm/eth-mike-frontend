@@ -62,9 +62,11 @@ class AssessmentType(IntEnum):
     RangeOfMotion = 0
     Force = 1
     Motor = 2
-    SensoriMotor = 3,
+    SensoriMotor = 3
     PositionMatching = 4
     PreciseReaching = 5
+    PassiveMatching = 6
+    ActiveMatching = 7
 
 
 @dataclass

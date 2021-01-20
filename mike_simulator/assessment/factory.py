@@ -10,6 +10,8 @@ _assessments_class_for_type = {
     AssessmentType.Motor: MotorAssessment,
     AssessmentType.SensoriMotor: SensoriMotorAssessment,
     AssessmentType.PreciseReaching: PreciseReachAssessment,
+    AssessmentType.PassiveMatching: PassiveMatchingAssessment,
+    AssessmentType.ActiveMatching: ActiveMatchingAssessment,
 }
 
 

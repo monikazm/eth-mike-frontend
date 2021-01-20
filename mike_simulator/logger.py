@@ -22,6 +22,8 @@ class Logger:
         AssessmentType.Motor: 'Motor Task',
         AssessmentType.SensoriMotor: 'Sensorimotor Task',
         AssessmentType.PreciseReaching: 'Precise Reaching Task',
+        AssessmentType.PassiveMatching: 'PassiveMatchingAssessment',
+        AssessmentType.ActiveMatching: 'ActiveMatchingAssessment',
     }
 
     def __init__(self, patient: PatientResponse):
