@@ -76,6 +76,7 @@ class ControlResponse:
     Restart: bool = False
     FrontendStarted: bool = False
     Close: bool = False
+    TargetPosition: float = 0
 
 
 @dataclass
