@@ -36,7 +36,7 @@ class ForceAssessment(Assessment):
             motor_state.TrialNr += 1
             self.goto_state(S.STANDBY)
 
-    def on_start(self, motor_state: MotorState, input_handler: InputHandler):
+    def on_start(self, motor_state: MotorState, input_handler: InputHandler, target_position: float):
         if self.in_state(S.STANDBY):
             # Start a trial
             self.timer.start(3.0)

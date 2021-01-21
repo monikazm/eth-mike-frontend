@@ -57,7 +57,7 @@ class MotorAssessment(Assessment):
             motor_state.TrialNr += 1
             self.goto_state(S.STANDBY)
 
-    def on_start(self, motor_state: MotorState, input_handler: InputHandler):
+    def on_start(self, motor_state: MotorState, input_handler: InputHandler, target_position: float):
         if self.in_state(S.STANDBY):
             # Direct robot to move to starting position within 3 seconds
             self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.StartingPosition, 3.0)

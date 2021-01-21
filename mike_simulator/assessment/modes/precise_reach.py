@@ -48,7 +48,7 @@ class PreciseReachAssessment(Assessment):
             motor_state.TrialNr += 1
             self.goto_state(S.STANDBY)
 
-    def on_start(self, motor_state: MotorState, input_handler: InputHandler):
+    def on_start(self, motor_state: MotorState, input_handler: InputHandler, target_position: float):
         if self.in_state(S.USER_INPUT):
             # Time is up, lock movement and wait for next trial to start (if any)
             motor_state.TargetState = False
