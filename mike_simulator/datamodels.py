@@ -83,6 +83,7 @@ class ControlResponse:
 class PatientResponse:
     LeftHand: bool = False
     AssessmentMode: AssessmentType = AssessmentType.Disabled
+    IsTraining: bool = False
     SubjectNr: str = ''
     DateTime: str = ''
     PhaseTrialCount: Int32 = 0
