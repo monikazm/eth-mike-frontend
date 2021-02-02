@@ -12,7 +12,7 @@ from mike_simulator.util import PrintUtil
 class S(IntEnum):
     STANDBY = 0
     MOVING_TO_START = 1
-    MOVING_TO_HIDDEN_DEST = 2
+    MOVING_TO_TARGET = 2
     USER_INPUT = 3
 
     FINISHED = -1
@@ -65,8 +65,8 @@ class PassiveMatchingAssessment(Assessment):
 
                 # Instruct robot to move to random destination within 3 seconds
                 self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.TargetPosition, 3.0)
-                self.goto_state(S.MOVING_TO_HIDDEN_DEST)
-        elif self.in_state(S.MOVING_TO_HIDDEN_DEST):
+                self.goto_state(S.MOVING_TO_TARGET)
+        elif self.in_state(S.MOVING_TO_TARGET):
             # Automatic movement towards random destination
             if motor_state.move_using(self.auto_mover).has_finished():
                 # Once target is reached, wait for user to enter a position in the frontend
@@ -75,7 +75,7 @@ class PassiveMatchingAssessment(Assessment):
 
     # Uncomment to support skipping for position matching
     # def on_skip(self, motor_state: MotorState):
-    #     if self.in_state(S.MOVING_TO_HIDDEN_DEST) or self.in_state(S.USER_INPUT):
+    #     if self.in_state(S.MOVING_TO_TARGET) or self.in_state(S.USER_INPUT):
     #         if motor_state.TrialNr > 1:
     #             motor_state.TrialNr = self.trial_count + 1
     #             self.goto_state(S.FINISHED)
