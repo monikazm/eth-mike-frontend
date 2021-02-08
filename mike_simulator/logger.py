@@ -24,6 +24,7 @@ class Logger:
         AssessmentType.PreciseReaching: 'Precise Reaching Task',
         AssessmentType.PassiveMatching: 'PassiveMatchingAssessment',
         AssessmentType.ActiveMatching: 'ActiveMatchingAssessment',
+        AssessmentType.TeachAndReproduce: 'TeachAndReproduce',
     }
 
     def __init__(self, patient: PatientResponse):

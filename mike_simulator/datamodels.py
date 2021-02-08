@@ -67,6 +67,7 @@ class AssessmentType(IntEnum):
     PreciseReaching = 5
     PassiveMatching = 6
     ActiveMatching = 7
+    TeachAndReproduce = 8
 
 
 @dataclass

@@ -12,6 +12,7 @@ _assessments_class_for_type = {
     AssessmentType.PreciseReaching: PreciseReachAssessment,
     AssessmentType.PassiveMatching: PassiveMatchingAssessment,
     AssessmentType.ActiveMatching: ActiveMatchingAssessment,
+    AssessmentType.TeachAndReproduce: TeachAndReproduceAssessment,
 }
 
 
