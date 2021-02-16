@@ -56,7 +56,7 @@ class TeachAndReproduceAssessment(Assessment):
 
         if self.in_state(S.STANDBY):
             # Start new trial, instruct robot to move to starting position within 3 seconds
-            self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.StartingPosition, 0.5)
+            self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.StartingPosition, 3.0)
             self.goto_state(S.MOVING_TO_START)
             self.target_position = target_position
 
@@ -69,7 +69,7 @@ class TeachAndReproduceAssessment(Assessment):
                 motor_state.TargetPosition = self.target_position
 
                 # Instruct robot to move to target destination within 3 seconds
-                self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.TargetPosition, 0.5)
+                self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.TargetPosition, 3.0)
                 self.goto_state(S.MOVING_TO_TARGET)
 
         elif self.in_state(S.MOVING_TO_TARGET):
@@ -81,9 +81,9 @@ class TeachAndReproduceAssessment(Assessment):
 
         elif self.in_state(S.WAIT_AT_TARGET):
             time_elapsed = time.time() - self.waiting_since
-            if time_elapsed > 1.0:  # wait for a second
+            if time_elapsed > 2.0:  # wait for two second
                 # Instruct robot to move to back to start position within 3 seconds
-                self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.StartingPosition, 0.5)
+                self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.StartingPosition, 3.0)
                 self.goto_state(S.MOVING_BACK_TO_START)
 
         elif self.in_state(S.MOVING_BACK_TO_START):
