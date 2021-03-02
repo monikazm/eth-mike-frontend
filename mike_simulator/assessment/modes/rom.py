@@ -110,4 +110,4 @@ class RangeOfMotionAssessment(Assessment):
                 # Automatically move on to next trial
                 self._prepare_next_trial_or_finish(motor_state)
                 if not self.in_state(S.FINISHED):
-                    self.on_start(motor_state, input_handler)
+                    self.on_start(motor_state, input_handler, 0)
