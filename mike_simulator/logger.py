@@ -4,7 +4,7 @@ import random
 from datetime import datetime
 
 from mike_simulator.config import cfg
-from mike_simulator.datamodels import MotorState, PatientResponse, AssessmentType
+from mike_simulator.datamodels import MotorState, PatientResponse, TaskType
 from mike_simulator.input import InputState
 
 
@@ -16,15 +16,15 @@ class Logger:
     )
 
     TASK_NAMES = {
-        AssessmentType.Force: 'Force Task',
-        AssessmentType.PositionMatching: 'Position Matching Task',
-        AssessmentType.RangeOfMotion: 'Range of Motion Task',
-        AssessmentType.Motor: 'Motor Task',
-        AssessmentType.SensoriMotor: 'Sensorimotor Task',
-        AssessmentType.PreciseReaching: 'Precise Reaching Task',
-        AssessmentType.PassiveMatching: 'PassiveMatchingAssessment',
-        AssessmentType.ActiveMatching: 'ActiveMatchingAssessment',
-        AssessmentType.TeachAndReproduce: 'TeachAndReproduce',
+        TaskType.Force: 'Force Task',
+        TaskType.PositionMatching: 'Position Matching Task',
+        TaskType.RangeOfMotion: 'Range of Motion Task',
+        TaskType.Motor: 'Motor Task',
+        TaskType.SensoriMotor: 'Sensorimotor Task',
+        TaskType.PreciseReaching: 'Precise Reaching Task',
+        TaskType.PassiveMatching: 'PassiveMatchingAssessment',
+        TaskType.ActiveMatching: 'ActiveMatchingAssessment',
+        TaskType.TeachAndReproduce: 'TeachAndReproduce',
     }
 
     def __init__(self, patient: PatientResponse):
@@ -33,7 +33,7 @@ class Logger:
                                  cfg.Logging.data_root_dir,
                                  patient.StudyName,
                                  patient.SubjectNr,
-                                 Logger.TASK_NAMES[patient.AssessmentMode],
+                                 Logger.TASK_NAMES[patient.Task],
                                  f'{"Left" if patient.LeftHand else "Right"} Hand')
         os.makedirs(directory, exist_ok=True)
 

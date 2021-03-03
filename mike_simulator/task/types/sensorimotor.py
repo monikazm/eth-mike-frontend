@@ -1,7 +1,7 @@
 from enum import IntEnum
 from typing import Optional
 
-from mike_simulator.assessment import Assessment
+from mike_simulator.task import Task
 from mike_simulator.auto_movement.factory import AutoMover, AutoMoverFactory
 from mike_simulator.config import cfg
 from mike_simulator.datamodels import MotorState, PatientResponse
@@ -16,7 +16,7 @@ class S(IntEnum):
     FINISHED = -1
 
 
-class SensoriMotorAssessment(Assessment):
+class SensoriMotorAssessment(Task):
     def __init__(self, motor_state: MotorState, patient: PatientResponse):
         super().__init__(S.STANDBY)
         self.direction = 1.0 if patient.LeftHand else -1.0
@@ -60,7 +60,7 @@ class SensoriMotorAssessment(Assessment):
                     (amplitude, 4.0 * factor)
                 ]
                 self.auto_mover = AutoMoverFactory.make_sine_mover(motor_state.StartingPosition,
-                                                                   cfg.Assessments.sensorimotor_movement_duration,
+                                                                   cfg.Tasks.sensorimotor_movement_duration,
                                                                    *sine_params)
 
                 # Allow user movement

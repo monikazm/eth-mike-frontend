@@ -7,17 +7,17 @@ from mike_simulator.input import InputHandler, InputState
 
 class InputHandlerBase(InputHandler, metaclass=ABCMeta):
     def __init__(self):
-        self.assessment = None
+        self.task = None
         self.movement_locked = True
         self._current_input_state = InputState()
 
-    def begin_assessment(self, assessment_mode):
-        self.assessment = assessment_mode
+    def begin_task(self, task):
+        self.task = task
         self._current_input_state = InputState()
         self.movement_locked = True
 
-    def finish_assessment(self):
-        self.begin_assessment(None)
+    def finish_task(self):
+        self.begin_task(None)
 
     def update_input_state(self, motor_state: MotorState, delta_time: float):
         state = self.current_input_state

@@ -2,7 +2,7 @@ import random
 from enum import IntEnum
 from typing import Optional
 
-from mike_simulator.assessment import Assessment
+from mike_simulator.task import Task
 from mike_simulator.auto_movement.factory import AutoMover, AutoMoverFactory
 from mike_simulator.datamodels import MotorState, PatientResponse
 from mike_simulator.input import InputHandler
@@ -17,26 +17,34 @@ class S(IntEnum):
     FINISHED = -1
 
 
-class ActiveMatchingAssessment(Assessment):
+class PreciseReachAssessment(Task):
     def __init__(self, motor_state: MotorState, patient: PatientResponse) -> None:
         super().__init__(S.STANDBY)
 
         self.direction = 1.0 if patient.LeftHand else -1.0
-        self.trial_count = patient.PhaseTrialCount
-        motor_state.StartingPosition = 30.0 * self.direction
 
         # Used for automatic movement to starting position
         self.auto_mover: Optional[AutoMover] = None
+
+        # Compute randomized list of 20 flexion/extension phases (10 each)
+        count = patient.PhaseTrialCount
+        self.phases = [True]*count + [False]*count
+        random.shuffle(self.phases)
 
         # Initialize trial
         self._prepare_next_trial_or_finish(motor_state)
 
     def _prepare_next_trial_or_finish(self, motor_state: MotorState):
-        if motor_state.TrialNr == self.trial_count:
+        if motor_state.TrialNr == len(self.phases):
             self.goto_state(S.FINISHED)
         else:
             # Set start and end position according to random phase
             motor_state.StartingPosition = 30.0 * self.direction
+            if self.phases[motor_state.TrialNr]:
+                motor_state.TargetPosition = 50.0 * self.direction
+            else:
+                motor_state.TargetPosition = 70.0 * self.direction
+
             motor_state.TrialNr += 1
             self.goto_state(S.STANDBY)
 

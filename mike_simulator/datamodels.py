@@ -57,7 +57,7 @@ class RomState(IntEnum):
     AutomaticPassiveMovement = 2
 
 
-class AssessmentType(IntEnum):
+class TaskType(IntEnum):
     Disabled = -1
     RangeOfMotion = 0
     Force = 1
@@ -83,7 +83,7 @@ class ControlResponse:
 @dataclass
 class PatientResponse:
     LeftHand: bool = False
-    AssessmentMode: AssessmentType = AssessmentType.Disabled
+    Task: TaskType = TaskType.Disabled
     SubjectNr: str = ''
     DateTime: str = ''
     PhaseTrialCount: Int32 = 0

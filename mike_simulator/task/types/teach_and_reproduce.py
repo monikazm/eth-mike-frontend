@@ -3,7 +3,7 @@ import time
 from enum import IntEnum
 from typing import Optional
 
-from mike_simulator.assessment import Assessment
+from mike_simulator.task import Task
 from mike_simulator.auto_movement.factory import AutoMover, AutoMoverFactory
 from mike_simulator.datamodels import MotorState, PatientResponse
 from mike_simulator.input import InputHandler
@@ -21,7 +21,7 @@ class S(IntEnum):
     FINISHED = -1
 
 
-class TeachAndReproduceAssessment(Assessment):
+class TeachAndReproduceAssessment(Task):
     def __init__(self, motor_state: MotorState, patient: PatientResponse) -> None:
         super().__init__(S.STANDBY)
         self.direction = 1 if patient.LeftHand else -1

@@ -14,13 +14,13 @@ class InputHandler(metaclass=ABCMeta):
     """Abstract interface for input handler"""
 
     @abstractmethod
-    def begin_assessment(self, assessment_mode):
-        """Make InputHandler aware than an assessment was started."""
+    def begin_task(self, task):
+        """Make InputHandler aware than a task was started."""
         pass
 
     @abstractmethod
-    def finish_assessment(self):
-        """Make InputHandler aware that the current assessment ended."""
+    def finish_task(self):
+        """Make InputHandler aware that the current task ended."""
         pass
 
     @abstractmethod

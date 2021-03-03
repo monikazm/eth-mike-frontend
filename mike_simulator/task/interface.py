@@ -4,8 +4,8 @@ from mike_simulator.datamodels import MotorState
 from mike_simulator.input import InputHandler
 
 
-class Assessment(metaclass=ABCMeta):
-    """Abstract interface for an assessment"""
+class Task(metaclass=ABCMeta):
+    """Abstract interface for a task"""
 
     # Abstract Interface
 
@@ -29,15 +29,15 @@ class Assessment(metaclass=ABCMeta):
     # Helper Functionality
 
     def is_finished(self) -> bool:
-        """Returns true if assessment is finished."""
+        """Returns true if task is finished."""
         return self.state == -1
 
     def in_state(self, state) -> bool:
-        """Return true if the Assessment is in the given state."""
+        """Return true if the task is in the given state."""
         return self.state == state
 
     def goto_state(self, state):
-        """Perform an assessment state transition."""
+        """Perform an task state transition."""
         self.state = state
 
     @abstractmethod
