@@ -10,10 +10,15 @@ _assessments_class_for_type = {
     AssessmentType.Motor: MotorAssessment,
     AssessmentType.SensoriMotor: SensoriMotorAssessment,
     AssessmentType.PreciseReaching: PreciseReachAssessment,
+    AssessmentType.PassiveMatching: PassiveMatchingAssessment,
+    AssessmentType.ActiveMatching: ActiveMatchingAssessment,
+    AssessmentType.TeachAndReproduce: TeachAndReproduceAssessment,
 }
 
 
 class AssessmentFactory:
     @staticmethod
     def create(assessment: AssessmentType, motor_state, patient_data) -> Assessment:
+        if (_assessments_class_for_type.get(assessment) is None):
+            raise ValueError('AssessmentType unknown')
         return _assessments_class_for_type[assessment](motor_state, patient_data)

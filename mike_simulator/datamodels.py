@@ -62,9 +62,12 @@ class AssessmentType(IntEnum):
     RangeOfMotion = 0
     Force = 1
     Motor = 2
-    SensoriMotor = 3,
+    SensoriMotor = 3
     PositionMatching = 4
     PreciseReaching = 5
+    PassiveMatching = 6
+    ActiveMatching = 7
+    TeachAndReproduce = 8
 
 
 @dataclass
@@ -74,6 +77,7 @@ class ControlResponse:
     Restart: bool = False
     FrontendStarted: bool = False
     Close: bool = False
+    TargetPosition: float = 0
 
 
 @dataclass

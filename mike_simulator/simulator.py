@@ -64,11 +64,14 @@ class BackendSimulator:
         PrintUtil.print_normally(f'Received {data}')
         self.current_patient = data
         self._reset()
-        self.current_assessment = AssessmentFactory.create(data.AssessmentMode, self.current_motor_state, self.current_patient)
-        self.input_handler.begin_assessment(self.current_assessment)
-        if cfg.Logging.enabled:
-            self.logger = Logger(self.current_patient)
-        self.goto_state(SimulatorState.READY)
+        try:
+            self.current_assessment = AssessmentFactory.create(data.AssessmentMode, self.current_motor_state, self.current_patient)
+            self.input_handler.begin_assessment(self.current_assessment)
+            if cfg.Logging.enabled:
+                self.logger = Logger(self.current_patient)
+            self.goto_state(SimulatorState.READY)
+        except ValueError as err:
+            print(err.args)
 
     def update_control_data(self, data: ControlResponse):
         PrintUtil.print_normally(f'Received {data}')
@@ -80,7 +83,7 @@ class BackendSimulator:
             self.goto_state(SimulatorState.WAITING_FOR_PATIENT)
         elif data.Start:
             if self.check_in_state(SimulatorState.READY, SimulatorState.RUNNING):
-                self.current_assessment.on_start(self.current_motor_state, self.input_handler)
+                self.current_assessment.on_start(self.current_motor_state, self.input_handler, data.TargetPosition)
                 self.last_update = time.time_ns()
                 self.goto_state(SimulatorState.RUNNING)
         elif data.FrontendStarted:

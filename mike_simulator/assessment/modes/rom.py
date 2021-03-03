@@ -66,7 +66,7 @@ class RangeOfMotionAssessment(Assessment):
         else:
             motor_state.StartingPosition = 30.0 * self.direction
 
-    def on_start(self, motor_state: MotorState, input_handler: InputHandler):
+    def on_start(self, motor_state: MotorState, input_handler: InputHandler, target_position: float):
         if self.in_state(S.INSTRUCTIONS):
             self._prepare_next_trial_or_finish(motor_state)
 
@@ -110,4 +110,4 @@ class RangeOfMotionAssessment(Assessment):
                 # Automatically move on to next trial
                 self._prepare_next_trial_or_finish(motor_state)
                 if not self.in_state(S.FINISHED):
-                    self.on_start(motor_state, input_handler)
+                    self.on_start(motor_state, input_handler, 0)
