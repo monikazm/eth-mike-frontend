@@ -1,4 +1,4 @@
-from mike_simulator.assessment import Assessment
+from mike_simulator.assessment import Task
 from mike_simulator.assessment.modes import *
 from mike_simulator.datamodels import TaskType
 
@@ -18,7 +18,7 @@ _tasks_class_by_type = {
 
 class TaskFactory:
     @staticmethod
-    def create(task: TaskType, motor_state, patient_data) -> Assessment:
+    def create(task: TaskType, motor_state, patient_data) -> Task:
         if (_tasks_class_by_type.get(task) is None):
             raise ValueError('TaskType unknown')
         return _tasks_class_by_type[task](motor_state, patient_data)

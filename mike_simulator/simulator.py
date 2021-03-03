@@ -3,7 +3,7 @@ import time
 from enum import Enum
 from typing import Optional
 
-from mike_simulator.assessment.factory import Assessment, TaskFactory
+from mike_simulator.assessment.factory import Task, TaskFactory
 from mike_simulator.config import cfg
 from mike_simulator.datamodels import ControlResponse, PatientResponse, MotorState, Constants
 from mike_simulator.input.factory import InputHandlerFactory
@@ -30,7 +30,7 @@ class BackendSimulator:
         self.current_patient: PatientResponse = PatientResponse()
         self.current_state = SimulatorState.WAITING_FOR_PATIENT
         self.current_motor_state: Optional[MotorState] = None
-        self.current_assessment: Optional[Assessment] = None
+        self.current_assessment: Optional[Task] = None
         self.logger: Optional[Logger] = None
 
         self.last_update = -1

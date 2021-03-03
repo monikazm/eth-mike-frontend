@@ -1,6 +1,6 @@
 from enum import IntEnum
 
-from mike_simulator.assessment import Assessment
+from mike_simulator.assessment import Task
 from mike_simulator.datamodels import MotorState, PatientResponse
 from mike_simulator.input import InputHandler
 from mike_simulator.util import PrintUtil, Timer
@@ -14,7 +14,7 @@ class S(IntEnum):
     FINISHED = -1
 
 
-class ForceAssessment(Assessment):
+class ForceAssessment(Task):
     def __init__(self, motor_state: MotorState, patient: PatientResponse) -> None:
         super().__init__(S.STANDBY)
 

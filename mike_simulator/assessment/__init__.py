@@ -1,1 +1,1 @@
-from .interface import Assessment
+from .interface import Task
