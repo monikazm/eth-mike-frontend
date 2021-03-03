@@ -33,7 +33,7 @@ class Logger:
                                  cfg.Logging.data_root_dir,
                                  patient.StudyName,
                                  patient.SubjectNr,
-                                 Logger.TASK_NAMES[patient.AssessmentMode],
+                                 Logger.TASK_NAMES[patient.Task],
                                  f'{"Left" if patient.LeftHand else "Right"} Hand')
         os.makedirs(directory, exist_ok=True)
 

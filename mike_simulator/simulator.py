@@ -65,7 +65,7 @@ class BackendSimulator:
         self.current_patient = data
         self._reset()
         try:
-            self.current_assessment = AssessmentFactory.create(data.AssessmentMode, self.current_motor_state, self.current_patient)
+            self.current_assessment = AssessmentFactory.create(data.Task, self.current_motor_state, self.current_patient)
             self.input_handler.begin_assessment(self.current_assessment)
             if cfg.Logging.enabled:
                 self.logger = Logger(self.current_patient)

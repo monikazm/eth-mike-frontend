@@ -83,7 +83,7 @@ class ControlResponse:
 @dataclass
 class PatientResponse:
     LeftHand: bool = False
-    AssessmentMode: TaskType = TaskType.Disabled
+    Task: TaskType = TaskType.Disabled
     SubjectNr: str = ''
     DateTime: str = ''
     PhaseTrialCount: Int32 = 0
