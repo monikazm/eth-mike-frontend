@@ -3,7 +3,7 @@ import time
 from enum import Enum
 from typing import Optional
 
-from mike_simulator.assessment.factory import Task, TaskFactory
+from mike_simulator.task.factory import Task, TaskFactory
 from mike_simulator.config import cfg
 from mike_simulator.datamodels import ControlResponse, PatientResponse, MotorState, Constants
 from mike_simulator.input.factory import InputHandlerFactory

@@ -1,6 +1,6 @@
 from keyboard import is_pressed
 
-from mike_simulator.assessment.modes import *
+from mike_simulator.task.types import *
 from mike_simulator.datamodels import MotorState, Constants
 from mike_simulator.input import InputState
 from mike_simulator.input.input_base import InputHandlerBase

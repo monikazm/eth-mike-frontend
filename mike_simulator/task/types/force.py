@@ -1,6 +1,6 @@
 from enum import IntEnum
 
-from mike_simulator.assessment import Task
+from mike_simulator.task import Task
 from mike_simulator.datamodels import MotorState, PatientResponse
 from mike_simulator.input import InputHandler
 from mike_simulator.util import PrintUtil, Timer

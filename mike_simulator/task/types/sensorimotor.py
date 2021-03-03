@@ -1,7 +1,7 @@
 from enum import IntEnum
 from typing import Optional
 
-from mike_simulator.assessment import Task
+from mike_simulator.task import Task
 from mike_simulator.auto_movement.factory import AutoMover, AutoMoverFactory
 from mike_simulator.config import cfg
 from mike_simulator.datamodels import MotorState, PatientResponse
