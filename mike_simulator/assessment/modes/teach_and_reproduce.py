@@ -98,11 +98,3 @@ class TeachAndReproduceAssessment(Assessment):
         elif self.in_state(S.USER_INPUT):
             # Print current position
             PrintUtil.print_inplace(f'Current pos: {motor_state.Position:.3f}°')
-
-
-    # Uncomment to support skipping for position matching
-    # def on_skip(self, motor_state: MotorState):
-    #     if self.in_state(S.MOVING_TO_TARGET) or self.in_state(S.USER_INPUT):
-    #         if motor_state.TrialNr > 1:
-    #             motor_state.TrialNr = self.trial_count + 1
-    #             self.goto_state(S.FINISHED)
