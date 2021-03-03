@@ -30,7 +30,7 @@ class BackendSimulator:
         self.current_patient: PatientResponse = PatientResponse()
         self.current_state = SimulatorState.WAITING_FOR_PATIENT
         self.current_motor_state: Optional[MotorState] = None
-        self.current_assessment: Optional[Task] = None
+        self.current_task: Optional[Task] = None
         self.logger: Optional[Logger] = None
 
         self.last_update = -1
@@ -65,8 +65,8 @@ class BackendSimulator:
         self.current_patient = data
         self._reset()
         try:
-            self.current_assessment = TaskFactory.create(data.Task, self.current_motor_state, self.current_patient)
-            self.input_handler.begin_task(self.current_assessment)
+            self.current_task = TaskFactory.create(data.Task, self.current_motor_state, self.current_patient)
+            self.input_handler.begin_task(self.current_task)
             if cfg.Logging.enabled:
                 self.logger = Logger(self.current_patient)
             self.goto_state(SimulatorState.READY)
@@ -83,7 +83,7 @@ class BackendSimulator:
             self.goto_state(SimulatorState.WAITING_FOR_PATIENT)
         elif data.Start:
             if self.check_in_state(SimulatorState.READY, SimulatorState.RUNNING):
-                self.current_assessment.on_start(self.current_motor_state, self.input_handler, data.TargetPosition)
+                self.current_task.on_start(self.current_motor_state, self.input_handler, data.TargetPosition)
                 self.last_update = time.time_ns()
                 self.goto_state(SimulatorState.RUNNING)
         elif data.FrontendStarted:
@@ -93,7 +93,7 @@ class BackendSimulator:
 
     def handle_skip(self):
         if self.check_in_state(SimulatorState.READY, SimulatorState.RUNNING):
-            self.current_assessment.on_skip(self.current_motor_state)
+            self.current_task.on_skip(self.current_motor_state)
 
     def get_motor_state(self) -> MotorState:
         self._update_motor_state()
@@ -102,7 +102,7 @@ class BackendSimulator:
 
     def _reset(self):
         self.current_motor_state = MotorState.new()
-        self.current_assessment = None
+        self.current_task = None
         self.logger = None
         self.input_handler.finish_task()
 
@@ -121,15 +121,15 @@ class BackendSimulator:
         self.current_motor_state.Force = input_state.force
         self.current_motor_state.Position = self.clamp_position(pos + input_state.velocity * delta_time)
 
-        # Update assessment state (if any)
-        if self.current_assessment is not None:
-            self.current_assessment.on_update(self.current_motor_state, self.input_handler)
+        # Update task state (if any)
+        if self.current_task is not None:
+            self.current_task.on_update(self.current_motor_state, self.input_handler)
 
-            # Check if assessment is finished
-            if self.current_assessment.is_finished():
+            # Check if task is finished
+            if self.current_task.is_finished():
                 if self.check_in_state(SimulatorState.RUNNING):
                     self.input_handler.finish_task()
-                    self.current_assessment = None
+                    self.current_task = None
                     self.current_motor_state = MotorState.new(Finished=True)
                     self.goto_state(SimulatorState.FINISHED)
 
