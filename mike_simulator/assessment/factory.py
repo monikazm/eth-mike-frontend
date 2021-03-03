@@ -3,7 +3,7 @@ from mike_simulator.assessment.modes import *
 from mike_simulator.datamodels import TaskType
 
 # Dict for looking up class corresponding to assessment type
-_assessments_class_for_type = {
+_tasks_class_by_type = {
     TaskType.Force: ForceAssessment,
     TaskType.PositionMatching: PositionMatchingAssessment,
     TaskType.RangeOfMotion: RangeOfMotionAssessment,
@@ -16,9 +16,9 @@ _assessments_class_for_type = {
 }
 
 
-class AssessmentFactory:
+class TaskFactory:
     @staticmethod
-    def create(assessment: TaskType, motor_state, patient_data) -> Assessment:
-        if (_assessments_class_for_type.get(assessment) is None):
+    def create(task: TaskType, motor_state, patient_data) -> Assessment:
+        if (_tasks_class_by_type.get(task) is None):
             raise ValueError('TaskType unknown')
-        return _assessments_class_for_type[assessment](motor_state, patient_data)
+        return _tasks_class_by_type[task](motor_state, patient_data)

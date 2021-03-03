@@ -3,7 +3,7 @@ import time
 from enum import Enum
 from typing import Optional
 
-from mike_simulator.assessment.factory import Assessment, AssessmentFactory
+from mike_simulator.assessment.factory import Assessment, TaskFactory
 from mike_simulator.config import cfg
 from mike_simulator.datamodels import ControlResponse, PatientResponse, MotorState, Constants
 from mike_simulator.input.factory import InputHandlerFactory
@@ -65,7 +65,7 @@ class BackendSimulator:
         self.current_patient = data
         self._reset()
         try:
-            self.current_assessment = AssessmentFactory.create(data.Task, self.current_motor_state, self.current_patient)
+            self.current_assessment = TaskFactory.create(data.Task, self.current_motor_state, self.current_patient)
             self.input_handler.begin_assessment(self.current_assessment)
             if cfg.Logging.enabled:
                 self.logger = Logger(self.current_patient)
