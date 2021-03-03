@@ -18,7 +18,6 @@ class S(IntEnum):
     FINISHED = -1
 
 
-#TODO: Need to implement the passive matching logic, is still the same as precise reaching
 class PassiveMatchingAssessment(Assessment):
     def __init__(self, motor_state: MotorState, patient: PatientResponse) -> None:
         super().__init__(S.STANDBY)
@@ -72,10 +71,3 @@ class PassiveMatchingAssessment(Assessment):
                 # Once target is reached, wait for user to enter a position in the frontend
                 motor_state.TargetState = True
                 self.goto_state(S.USER_INPUT)
-
-    # Uncomment to support skipping for position matching
-    # def on_skip(self, motor_state: MotorState):
-    #     if self.in_state(S.MOVING_TO_TARGET) or self.in_state(S.USER_INPUT):
-    #         if motor_state.TrialNr > 1:
-    #             motor_state.TrialNr = self.trial_count + 1
-    #             self.goto_state(S.FINISHED)
