@@ -97,12 +97,12 @@ class Config:
     Network: NetworkSection = NetworkSection()
 
     @dataclass
-    class AssessmentsSection(IniSection):
+    class TasksSection(IniSection):
         sensorimotor_movement_duration: float = 30.0
 
         def validate(self):
             pass
-    Assessments: AssessmentsSection = AssessmentsSection()
+    Tasks: TasksSection = TasksSection()
 
 
 def load_configuration(filename: str = './simulator_config.ini'):

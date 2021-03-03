@@ -60,7 +60,7 @@ class SensoriMotorAssessment(Task):
                     (amplitude, 4.0 * factor)
                 ]
                 self.auto_mover = AutoMoverFactory.make_sine_mover(motor_state.StartingPosition,
-                                                                   cfg.Assessments.sensorimotor_movement_duration,
+                                                                   cfg.Tasks.sensorimotor_movement_duration,
                                                                    *sine_params)
 
                 # Allow user movement
