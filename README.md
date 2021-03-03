@@ -4,9 +4,6 @@
 Install the latest Python 3 release from https://www.python.org/downloads/
 During installation, ensure that the box "Add Python to PATH" is ticked.
 
-#### Development
-[Pycharm Community](https://www.jetbrains.com/de-de/pycharm/download/#section=windows) is a good, free IDE for python developement.
-
 #### Building standalone exe
 Simply double click build.bat, which will create a standalone executable file of the simulator.
 The resulting executable should then be portable, i.e. it should be able to run on any Windows system (even without a Python installation).
@@ -22,3 +19,6 @@ If you want to run the simulator from a plain terminal, use
 ```
 python -m mike_simulator.main
 ```
+
+## Development
+[Pycharm Community](https://www.jetbrains.com/de-de/pycharm/download/#section=windows) is a good, free IDE for python developement.
