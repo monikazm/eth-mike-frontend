@@ -66,7 +66,7 @@ class BackendSimulator:
         self._reset()
         try:
             self.current_assessment = TaskFactory.create(data.Task, self.current_motor_state, self.current_patient)
-            self.input_handler.begin_assessment(self.current_assessment)
+            self.input_handler.begin_task(self.current_assessment)
             if cfg.Logging.enabled:
                 self.logger = Logger(self.current_patient)
             self.goto_state(SimulatorState.READY)
@@ -104,7 +104,7 @@ class BackendSimulator:
         self.current_motor_state = MotorState.new()
         self.current_assessment = None
         self.logger = None
-        self.input_handler.finish_assessment()
+        self.input_handler.finish_task()
 
     def _update_motor_state(self):
         # Compute delta time
@@ -128,7 +128,7 @@ class BackendSimulator:
             # Check if assessment is finished
             if self.current_assessment.is_finished():
                 if self.check_in_state(SimulatorState.RUNNING):
-                    self.input_handler.finish_assessment()
+                    self.input_handler.finish_task()
                     self.current_assessment = None
                     self.current_motor_state = MotorState.new(Finished=True)
                     self.goto_state(SimulatorState.FINISHED)
