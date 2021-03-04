@@ -12,7 +12,7 @@ This document provides an overview of how to add a new assessment or exercise ta
 
 `datamodels.py` defines some properties of the simulator (e.g. MAX_FORCE = 50.0, this is linked to the fact that the physical sensor we are using can only go up to 50 N, so we want to have this constraint in the simulator too). It also creates Enums like we have in LabVIEW (e.g. Enum with all differnt tasks - order needs to correspond to the one in Frontend)
 
-Folders: input, auto_movememnt, assessment. Each of them have the same structure - it contains interface (abstract class), factory and subfolder with specific implementation. Factory chooses which of the specific implementations defined in the subfolder are used in the code (e.g. `input/factory.py` points to gamepad and kayboard inputs, which are defined inside `input/backends` subfolder). 
+Folders: input, auto_movememnt, assessment. Each of them have the same structure - it contains interface (abstract class), factory and subfolder with specific implementation. Factory chooses which of the specific implementations defined in the subfolder are used in the code (e.g. `input/factory.py` points to gamepad and keyboard inputs, which are defined inside `input/backends` subfolder). 
 
 * input: how simulator is controlled (keyboard and gamepad)
 * auto_movement: what kind of trajectories we simulate (currently: linear and sinusoidal) - in the hardware this would be implemented in a PID controller to make the robot move
