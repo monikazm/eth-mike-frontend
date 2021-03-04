@@ -23,7 +23,7 @@ Folders: input, auto_movememnt, assessment. Each of them have the same structure
 See [here](https://gitlab.ethz.ch/RELab/eth-mike/eth-mike-simulator/-/commit/791746397fc2cc8343fca8536fd2140a70f5d535) for a commit where a new task (Teach and Reproduce exercise) was added as an example - note that some file / folder naming was different (assessment changed into task)
 
 1. Go to `logger.py` and add `TaskType.NewTask: 'NewTask',` at the end of the existing list. 
-2. If your implementing an "active" task (patient needs to move, i.e. requires keyboard/gamepad input), go to `input/backends/kayboard_input.py` and `input/backends/gamepad_input.py` and add your new task to the list (see other tasks for guidance). 
+2. If your implementing an "active" task (patient needs to move, i.e. requires keyboard/gamepad input), go to `input/backends/keyboard_input.py` and `input/backends/gamepad_input.py` and add your new task to the list (see other tasks for guidance). 
 3. In `datamodels.py`add your task to the class TaskType.  
 4. Add a new file to `task/types` folder and give it a name corresponding to your new task name (follow the format `new_task.py`)
 5. Copy and paste one of the existing tasks that is the closest to what you want to do and modify what's neccessary. Define what does the simulator do in `on_start` and `on_update` (every loop)
