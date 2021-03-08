@@ -32,7 +32,6 @@ class TeachAndReproduceAssessment(Task):
         self.auto_mover: Optional[AutoMover] = None
 
         # Set starting position and initialize trial
-        motor_state.StartingPosition = 30.0 * self.direction
         self._prepare_next_trial_or_finish(motor_state)
 
         # Get Target Position in the beginning
@@ -47,7 +46,8 @@ class TeachAndReproduceAssessment(Task):
             motor_state.TrialNr += 1
             self.goto_state(S.STANDBY)
 
-    def on_start(self, motor_state: MotorState, input_handler: InputHandler, target_position: float):
+    def on_start(self, motor_state: MotorState, input_handler: InputHandler, starting_position: float, target_position: float):
+        motor_state.StartingPosition = starting_position;
         if self.in_state(S.USER_INPUT):
             # User confirmed selected position -> start next trial (if any)
             motor_state.TargetState = False
