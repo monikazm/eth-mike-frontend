@@ -44,7 +44,7 @@ class PositionMatchingAssessment(Task):
             motor_state.TrialNr += 1
             self.goto_state(S.STANDBY)
 
-    def on_start(self, motor_state: MotorState, input_handler: InputHandler, target_position: float):
+    def on_start(self, motor_state: MotorState, input_handler: InputHandler, starting_position: float, target_position: float):
         if self.in_state(S.USER_INPUT):
             # User confirmed selected position -> start next trial (if any)
             motor_state.TargetState = False

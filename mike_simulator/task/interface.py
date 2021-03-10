@@ -13,7 +13,7 @@ class Task(metaclass=ABCMeta):
         self.state = state
 
     @abstractmethod
-    def on_start(self, motor_state: MotorState, input_handler: InputHandler, target_position: float):
+    def on_start(self, motor_state: MotorState, input_handler: InputHandler, starting_position: float, target_position: float):
         """Should be called whenever the frontend issued a start command."""
         pass
 

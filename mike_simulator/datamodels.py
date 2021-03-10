@@ -77,6 +77,7 @@ class ControlResponse:
     Restart: bool = False
     FrontendStarted: bool = False
     Close: bool = False
+    StartingPosition: float = 0
     TargetPosition: float = 0
 
 

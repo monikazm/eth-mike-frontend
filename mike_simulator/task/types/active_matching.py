@@ -23,7 +23,6 @@ class ActiveMatchingAssessment(Task):
 
         self.direction = 1.0 if patient.LeftHand else -1.0
         self.trial_count = patient.PhaseTrialCount
-        motor_state.StartingPosition = 30.0 * self.direction
 
         # Used for automatic movement to starting position
         self.auto_mover: Optional[AutoMover] = None
@@ -36,11 +35,11 @@ class ActiveMatchingAssessment(Task):
             self.goto_state(S.FINISHED)
         else:
             # Set start and end position according to random phase
-            motor_state.StartingPosition = 30.0 * self.direction
             motor_state.TrialNr += 1
             self.goto_state(S.STANDBY)
 
-    def on_start(self, motor_state: MotorState, input_handler: InputHandler, target_position: float):
+    def on_start(self, motor_state: MotorState, input_handler: InputHandler, starting_position: float, target_position: float):
+        motor_state.StartingPosition = starting_position;
         if self.in_state(S.USER_INPUT):
             # Time is up, lock movement and wait for next trial to start (if any)
             motor_state.TargetState = False

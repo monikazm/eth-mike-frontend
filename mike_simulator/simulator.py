@@ -83,7 +83,7 @@ class BackendSimulator:
             self.goto_state(SimulatorState.WAITING_FOR_PATIENT)
         elif data.Start:
             if self.check_in_state(SimulatorState.READY, SimulatorState.RUNNING):
-                self.current_task.on_start(self.current_motor_state, self.input_handler, data.TargetPosition)
+                self.current_task.on_start(self.current_motor_state, self.input_handler, data.StartingPosition, data.TargetPosition)
                 self.last_update = time.time_ns()
                 self.goto_state(SimulatorState.RUNNING)
         elif data.FrontendStarted:
