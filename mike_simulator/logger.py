@@ -15,6 +15,7 @@ class Logger:
         'Velocity unfiltered', 'ROM State 0-Active 1-Passive 2-Automatic,Acceleration'
     )
 
+    # Has to match description strings of front end's TaskType enum
     TASK_NAMES = {
         TaskType.Force: 'Force Task',
         TaskType.PositionMatching: 'Position Matching Task',
@@ -22,9 +23,9 @@ class Logger:
         TaskType.Motor: 'Motor Task',
         TaskType.SensoriMotor: 'Sensorimotor Task',
         TaskType.PreciseReaching: 'Precise Reaching Task',
-        TaskType.PassiveMatching: 'PassiveMatchingAssessment',
-        TaskType.ActiveMatching: 'ActiveMatchingAssessment',
-        TaskType.TeachAndReproduce: 'TeachAndReproduce',
+        TaskType.PassiveMatching: 'Passive Matching Task',
+        TaskType.ActiveMatching: 'Active Matching Task',
+        TaskType.TeachAndReproduce: 'Teach & Reproduce Task',
     }
 
     def __init__(self, patient: PatientResponse):
