@@ -68,6 +68,7 @@ class TaskType(IntEnum):
     PassiveMatching = 6
     ActiveMatching = 7
     TeachAndReproduce = 8
+    Chiaras = 9
 
 
 @dataclass
