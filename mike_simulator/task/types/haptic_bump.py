@@ -17,7 +17,7 @@ class S(IntEnum):
     FINISHED = -1
 
 
-class ChiarasAssessment(Task):
+class HapticBumpAssessment(Task):
     def __init__(self, motor_state: MotorState, patient: PatientResponse) -> None:
         super().__init__(S.STANDBY)
 

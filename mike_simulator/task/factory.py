@@ -13,7 +13,7 @@ _tasks_class_by_type = {
     TaskType.PassiveMatching: PassiveMatchingAssessment,
     TaskType.ActiveMatching: ActiveMatchingAssessment,
     TaskType.TeachAndReproduce: TeachAndReproduceAssessment,
-    TaskType.Chiaras: ChiarasAssessment,
+    TaskType.HapticBump: HapticBumpAssessment,
 }
 
 
