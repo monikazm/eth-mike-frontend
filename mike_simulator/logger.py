@@ -12,7 +12,7 @@ class Logger:
     FIELDS = (
         'Time [s]', 'Position [deg]', 'Target Position [deg]', 'Frontend Started', 'Trial Nr', 'Velocity [deg/s]',
         'Current [A]', 'Starting position [deg]', 'Voltage force [V]', 'Force [N]', 'Force filtered [N]',
-        'Velocity unfiltered', 'ROM State 0-Active 1-Passive 2-Automatic,Acceleration'
+        'Velocity unfiltered', 'ROM State 0-Active 1-Passive 2-Automatic,Acceleration', 'Haptic Bump Force [N]'
     )
 
     # Has to match description strings of front end's TaskType enum
