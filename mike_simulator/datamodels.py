@@ -68,6 +68,7 @@ class TaskType(IntEnum):
     PassiveMatching = 6
     ActiveMatching = 7
     TeachAndReproduce = 8
+    EscapeTheForest = 9
 
 
 @dataclass
