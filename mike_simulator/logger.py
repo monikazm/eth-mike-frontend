@@ -26,7 +26,7 @@ class Logger:
         TaskType.PassiveMatching: 'Passive Matching Task',
         TaskType.ActiveMatching: 'Active Matching Task',
         TaskType.TeachAndReproduce: 'Teach & Reproduce Task',
-        TaskType.EscapeTheForest: 'Escape The Forest',
+        TaskType.EscapeTheForest: 'Escape The Forest Task',
     }
 
     def __init__(self, patient: PatientResponse):
