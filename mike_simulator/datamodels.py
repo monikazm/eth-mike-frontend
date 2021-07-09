@@ -80,6 +80,7 @@ class ControlResponse:
     Close: bool = False
     StartingPosition: float = 0
     TargetPosition: float = 0
+    repeatTrial: bool = False
 
 
 @dataclass

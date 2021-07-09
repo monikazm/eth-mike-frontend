@@ -4,7 +4,7 @@ from typing import Optional
 
 from mike_simulator.task import Task
 from mike_simulator.auto_movement.factory import AutoMover, AutoMoverFactory
-from mike_simulator.datamodels import MotorState, PatientResponse
+from mike_simulator.datamodels import MotorState, PatientResponse, ControlResponse
 from mike_simulator.input import InputHandler
 from mike_simulator.util import PrintUtil
 
@@ -19,7 +19,7 @@ class S(IntEnum):
 
 
 class EscapeTheForestAssessment(Task):
-    def __init__(self, motor_state: MotorState, patient: PatientResponse) -> None:
+    def __init__(self, motor_state: MotorState, patient: PatientResponse, control_response: ControlResponse) -> None:
         super().__init__(S.STANDBY)
         self.direction = 1 if patient.LeftHand else -1
 
@@ -29,16 +29,22 @@ class EscapeTheForestAssessment(Task):
         self.auto_mover: Optional[AutoMover] = None
 
         # Set starting position and initialize trial
-        self._prepare_next_trial_or_finish(motor_state)
+        self._prepare_next_trial_or_finish(motor_state, control_response)
 
         # Get Target Position in the beginning
         self.target_position = 0
 
-    def _prepare_next_trial_or_finish(self, motor_state: MotorState):
+    def _prepare_next_trial_or_finish(self, motor_state: MotorState, control_response: ControlResponse):
         if motor_state.TrialNr == self.trial_count:
+            print(motor_state.TrialNr)
+            print(self.trial_count)
             self.goto_state(S.FINISHED)
+        elif control_response.repeatTrial:
+            print("repeat Trial")
+            self.goto_state(S.STANDBY)
         else:
             motor_state.TrialNr += 1
+            print(motor_state.TrialNr)
             self.goto_state(S.STANDBY)
 
     def on_start(self, motor_state: MotorState, input_handler: InputHandler, starting_position: float, target_position: float):
