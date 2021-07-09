@@ -32,6 +32,7 @@ class BackendSimulator:
         self.current_motor_state: Optional[MotorState] = None
         self.current_task: Optional[Task] = None
         self.logger: Optional[Logger] = None
+        self.current_control_response = ControlResponse()
 
         self.last_update = -1
 
@@ -65,7 +66,7 @@ class BackendSimulator:
         self.current_patient = data
         self._reset()
         try:
-            self.current_task = TaskFactory.create(data.Task, self.current_motor_state, self.current_patient)
+            self.current_task = TaskFactory.create(data.Task, self.current_motor_state, self.current_patient, self.current_control_response)
             self.input_handler.begin_task(self.current_task)
             if cfg.Logging.enabled:
                 self.logger = Logger(self.current_patient)
@@ -83,7 +84,7 @@ class BackendSimulator:
             self.goto_state(SimulatorState.WAITING_FOR_PATIENT)
         elif data.Start:
             if self.check_in_state(SimulatorState.READY, SimulatorState.RUNNING):
-                self.current_task.on_start(self.current_motor_state, self.input_handler, data.StartingPosition, data.TargetPosition)
+                self.current_task.on_start(self.current_motor_state, self.current_control_response, self.input_handler, data.StartingPosition, data.TargetPosition)
                 self.last_update = time.time_ns()
                 self.goto_state(SimulatorState.RUNNING)
         elif data.FrontendStarted:

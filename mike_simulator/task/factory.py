@@ -19,7 +19,7 @@ _tasks_class_by_type = {
 
 class TaskFactory:
     @staticmethod
-    def create(task: TaskType, motor_state, patient_data) -> Task:
+    def create(task: TaskType, motor_state, patient_data, control_response) -> Task:
         if (_tasks_class_by_type.get(task) is None):
             raise ValueError('TaskType unknown')
-        return _tasks_class_by_type[task](motor_state, patient_data)
+        return _tasks_class_by_type[task](motor_state, patient_data, control_response)

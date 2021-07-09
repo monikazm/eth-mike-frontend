@@ -35,6 +35,9 @@ class EscapeTheForestAssessment(Task):
         self.target_position = 0
 
     def _prepare_next_trial_or_finish(self, motor_state: MotorState, control_response: ControlResponse):
+        print("We repeated the trial?")
+        print(control_response.repeatTrial)
+        print(motor_state.TargetPosition)
         if motor_state.TrialNr == self.trial_count:
             print(motor_state.TrialNr)
             print(self.trial_count)
@@ -47,12 +50,14 @@ class EscapeTheForestAssessment(Task):
             print(motor_state.TrialNr)
             self.goto_state(S.STANDBY)
 
-    def on_start(self, motor_state: MotorState, input_handler: InputHandler, starting_position: float, target_position: float):
+    def on_start(self, motor_state: MotorState, control_response: ControlResponse, input_handler: InputHandler, starting_position: float, target_position: float):
+        #super(EscapeTheForestAssessment, self).on_start(control_response:)
         motor_state.StartingPosition = starting_position;
         if self.in_state(S.USER_INPUT):
             # User confirmed selected position -> start next trial (if any)
             motor_state.TargetState = False
-            self._prepare_next_trial_or_finish(motor_state)
+            print(control_response.repeatTrial)
+            self._prepare_next_trial_or_finish(motor_state, control_response)
 
         if self.in_state(S.STANDBY):
             # Start new trial, instruct robot to move to starting position within 3 seconds

@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
-from mike_simulator.datamodels import MotorState
+from mike_simulator.datamodels import MotorState, ControlResponse
 from mike_simulator.input import InputHandler
 
 
@@ -13,7 +13,7 @@ class Task(metaclass=ABCMeta):
         self.state = state
 
     @abstractmethod
-    def on_start(self, motor_state: MotorState, input_handler: InputHandler, starting_position: float, target_position: float):
+    def on_start(self, motor_state: MotorState, control_response: ControlResponse, input_handler: InputHandler, starting_position: float, target_position: float):
         """Should be called whenever the frontend issued a start command."""
         pass
 
@@ -41,6 +41,6 @@ class Task(metaclass=ABCMeta):
         self.state = state
 
     @abstractmethod
-    def _prepare_next_trial_or_finish(self, motor_state: MotorState):
+    def _prepare_next_trial_or_finish(self, motor_state: MotorState, control_response: ControlResponse):
         """This should be called internally at the beginning and whenever a trial is finished"""
         pass
