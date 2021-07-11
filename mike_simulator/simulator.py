@@ -84,6 +84,10 @@ class BackendSimulator:
             self.goto_state(SimulatorState.WAITING_FOR_PATIENT)
         elif data.Start:
             if self.check_in_state(SimulatorState.READY, SimulatorState.RUNNING):
+                if data.repeatTrial:
+                    print("REPEAT TRIAL WAS TRUE")
+                    print(self.current_motor_state.TrialNr)
+                    self.current_motor_state.TrialNr -= 1
                 self.current_task.on_start(self.current_motor_state, self.current_control_response, self.input_handler, data.StartingPosition, data.TargetPosition)
                 self.last_update = time.time_ns()
                 self.goto_state(SimulatorState.RUNNING)
@@ -91,6 +95,7 @@ class BackendSimulator:
             if self.check_in_state(SimulatorState.RUNNING):
                 PrintUtil.print_normally('Frontend started')
                 self.frontend_started = True
+
 
     def handle_skip(self):
         if self.check_in_state(SimulatorState.READY, SimulatorState.RUNNING):

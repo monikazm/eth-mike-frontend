@@ -54,12 +54,14 @@ class EscapeTheForestAssessment(Task):
         #super(EscapeTheForestAssessment, self).on_start(control_response:)
         motor_state.StartingPosition = starting_position;
         if self.in_state(S.USER_INPUT):
+            print("in on_start state USER_INPUT")
             # User confirmed selected position -> start next trial (if any)
             motor_state.TargetState = False
             print(control_response.repeatTrial)
             self._prepare_next_trial_or_finish(motor_state, control_response)
 
         if self.in_state(S.STANDBY):
+            print("in on_start state STANDBY")
             # Start new trial, instruct robot to move to starting position within 3 seconds
             self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.StartingPosition, 3.0)
             self.goto_state(S.MOVING_TO_START)
