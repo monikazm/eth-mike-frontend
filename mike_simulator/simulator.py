@@ -66,7 +66,7 @@ class BackendSimulator:
         self.current_patient = data
         self._reset()
         try:
-            self.current_task = TaskFactory.create(data.Task, self.current_motor_state, self.current_patient, self.current_control_response)
+            self.current_task = TaskFactory.create(data.Task, self.current_motor_state, self.current_patient)
             self.input_handler.begin_task(self.current_task)
             if cfg.Logging.enabled:
                 self.logger = Logger(self.current_patient)
@@ -88,7 +88,7 @@ class BackendSimulator:
                     print("REPEAT TRIAL WAS TRUE")
                     print(self.current_motor_state.TrialNr)
                     self.current_motor_state.TrialNr -= 1
-                self.current_task.on_start(self.current_motor_state, self.current_control_response, self.input_handler, data.StartingPosition, data.TargetPosition)
+                self.current_task.on_start(self.current_motor_state, self.input_handler, data.StartingPosition, data.TargetPosition)
                 self.last_update = time.time_ns()
                 self.goto_state(SimulatorState.RUNNING)
         elif data.FrontendStarted:
