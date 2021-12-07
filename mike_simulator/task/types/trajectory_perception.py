@@ -1,4 +1,5 @@
 import random
+import time
 from enum import IntEnum
 from typing import Optional
 
@@ -13,7 +14,9 @@ class S(IntEnum):
     STANDBY = 0
     MOVING_TO_START = 1
     MOVING_TO_TARGET = 2
-    USER_INPUT = 3
+    WAIT_AT_TARGET = 3
+    MOVING_BACK_TO_START = 4
+    USER_INPUT = 5
 
     FINISHED = -1
 
@@ -33,6 +36,8 @@ class TrajectoryPerceptionAssessment(Task):
 
         # Get Target Position in the beginning
         self.target_position = 0
+
+        self.waiting_since = time.time()
 
     def _prepare_next_trial_or_finish(self, motor_state: MotorState):
         if motor_state.TrialNr == self.trial_count:
@@ -65,9 +70,33 @@ class TrajectoryPerceptionAssessment(Task):
                 # Instruct robot to move to random destination within 3 seconds
                 self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.TargetPosition, 3.0)
                 self.goto_state(S.MOVING_TO_TARGET)
+
         elif self.in_state(S.MOVING_TO_TARGET):
             # Automatic movement towards random destination
             if motor_state.move_using(self.auto_mover).has_finished():
                 # Once target is reached, wait for user to enter a position in the frontend
+                #motor_state.TargetState = True
+                #self.goto_state(S.USER_INPUT)
+                PrintUtil.print_normally('Reached target')
+                self.waiting_since = time.time()
+                self.goto_state(S.WAIT_AT_TARGET)
+
+        elif self.in_state(S.WAIT_AT_TARGET):
+            time_elapsed = time.time() - self.waiting_since
+            if time_elapsed > 1.0:  # wait for one second
+                # Instruct robot to move to back to start position within 3 seconds
+                self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.StartingPosition, 3.0)
+                self.goto_state(S.MOVING_BACK_TO_START)
+
+        elif self.in_state(S.MOVING_BACK_TO_START):
+            # Automatic movement back to start destination
+            if motor_state.move_using(self.auto_mover).has_finished():
+                PrintUtil.print_normally('Back at start')
+                # Once target is reached, wait for user to move back to the target and confirm input
                 motor_state.TargetState = True
+                #input_handler.unlock_movement()
                 self.goto_state(S.USER_INPUT)
+
+        elif self.in_state(S.USER_INPUT):
+            # Print current position
+            PrintUtil.print_inplace(f'Current pos: {motor_state.Position:.3f}°')
