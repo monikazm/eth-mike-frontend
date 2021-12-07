@@ -18,7 +18,7 @@ class S(IntEnum):
     FINISHED = -1
 
 
-class PassiveMatchingAssessment(Task):
+class TrajectoryPerceptionAssessment(Task):
     def __init__(self, motor_state: MotorState, patient: PatientResponse) -> None:
         super().__init__(S.STANDBY)
         self.direction = 1 if patient.LeftHand else -1

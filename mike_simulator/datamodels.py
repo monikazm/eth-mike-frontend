@@ -69,6 +69,7 @@ class TaskType(IntEnum):
     ActiveMatching = 7
     TeachAndReproduce = 8
     HapticBump = 9
+    TrajectoryPerception = 10
 
 
 @dataclass

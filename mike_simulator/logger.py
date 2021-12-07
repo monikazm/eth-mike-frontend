@@ -27,6 +27,7 @@ class Logger:
         TaskType.ActiveMatching: 'Active Matching Task',
         TaskType.TeachAndReproduce: 'Teach & Reproduce Task',
         TaskType.HapticBump: 'Haptic Bump Task',
+        TaskType.TrajectoryPerception: 'Trajectory Perception Task',
     }
 
     def __init__(self, patient: PatientResponse):
