@@ -54,8 +54,8 @@ class TrajectoryPerceptionAssessment(Task):
             self._prepare_next_trial_or_finish(motor_state)
 
         if self.in_state(S.STANDBY):
-            # Start new trial, instruct robot to move to starting position within 3 seconds
-            self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.StartingPosition, 3.0)
+            # Start new trial, instruct robot to move to starting position within 2 seconds
+            self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.StartingPosition, 2.0)
             self.goto_state(S.MOVING_TO_START)
             self.target_position = target_position
 
@@ -67,8 +67,8 @@ class TrajectoryPerceptionAssessment(Task):
                 PrintUtil.print_normally('Reached start')
                 motor_state.TargetPosition = self.target_position
 
-                # Instruct robot to move to random destination within 3 seconds
-                self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.TargetPosition, 3.0)
+                # Instruct robot to move to random destination within 2 seconds
+                self.auto_mover = AutoMoverFactory.make_linear_mover(motor_state.Position, motor_state.TargetPosition, 2.0)
                 self.goto_state(S.MOVING_TO_TARGET)
 
         elif self.in_state(S.MOVING_TO_TARGET):
@@ -99,4 +99,4 @@ class TrajectoryPerceptionAssessment(Task):
 
         elif self.in_state(S.USER_INPUT):
             # Print current position
-            PrintUtil.print_inplace(f'Current pos: {motor_state.Position:.3f}°')
+           PrintUtil.print_inplace(f'Current pos: {motor_state.Position:.3f}°')
