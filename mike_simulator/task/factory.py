@@ -3,6 +3,8 @@ from mike_simulator.task.types import *
 from mike_simulator.datamodels import TaskType
 
 # Dict for looking up class corresponding to task type
+from mike_simulator.task.types.trajectory_perception import TrajectoryPerceptionAssessment
+
 _tasks_class_by_type = {
     TaskType.Force: ForceAssessment,
     TaskType.PositionMatching: PositionMatchingAssessment,
@@ -13,6 +15,8 @@ _tasks_class_by_type = {
     TaskType.PassiveMatching: PassiveMatchingAssessment,
     TaskType.ActiveMatching: ActiveMatchingAssessment,
     TaskType.TeachAndReproduce: TeachAndReproduceAssessment,
+    TaskType.HapticBump: HapticBumpAssessment,
+    TaskType.TrajectoryPerception: TrajectoryPerceptionAssessment,
 }
 
 

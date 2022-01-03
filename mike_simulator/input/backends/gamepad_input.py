@@ -27,7 +27,7 @@ class GamepadInputHandler(InputHandlerBase):
                                                  Constants.USER_BURST_ACCEL_RATE,
                                                  6.0 * Constants.USER_BURST_ACCEL_RATE,
                                                  delta_time)
-        elif isinstance(self.task, (RangeOfMotionAssessment, SensoriMotorAssessment, PreciseReachAssessment, ActiveMatchingAssessment, TeachAndReproduceAssessment)):
+        elif isinstance(self.task, (RangeOfMotionAssessment, SensoriMotorAssessment, PreciseReachAssessment, ActiveMatchingAssessment, TeachAndReproduceAssessment, HapticBumpAssessment)):
             return self.analog_velocity(self.get_directional_input(), Constants.USER_NORMAL_MAX_SPEED)
         else:
             return 0.0

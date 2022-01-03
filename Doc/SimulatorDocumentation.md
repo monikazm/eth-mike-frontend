@@ -28,7 +28,7 @@ See [here](https://gitlab.ethz.ch/RELab/eth-mike/eth-mike-simulator/-/commit/791
 4. Add a new file to `task/types` folder and give it a name corresponding to your new task name (follow the format `new_task.py`)
 5. Copy and paste one of the existing tasks that is the closest to what you want to do and modify what's neccessary. Define what does the simulator do in `on_start` and `on_update` (every loop)
 6. Add your new task to `task/types/__init__.py`
-7. Add your new task to `task/types.py`
+7. Add your new task to `task/types.py`... doesn't exist: think they mean: factory.py
 8. Run the code - either by rebuiding the simulator with the build.bat or directly from the Pycharm terminal (see [readme](https://gitlab.ethz.ch/RELab/eth-mike/eth-mike-simulator/-/blob/master/README.md) for the command to use)
 
 

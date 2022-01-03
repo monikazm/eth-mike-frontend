@@ -68,6 +68,8 @@ class TaskType(IntEnum):
     PassiveMatching = 6
     ActiveMatching = 7
     TeachAndReproduce = 8
+    HapticBump = 9
+    TrajectoryPerception = 10
 
 
 @dataclass
@@ -79,6 +81,7 @@ class ControlResponse:
     Close: bool = False
     StartingPosition: float = 0
     TargetPosition: float = 0
+    HapticBumpForce: float = 0
 
 
 @dataclass
