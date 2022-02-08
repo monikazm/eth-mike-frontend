@@ -3,6 +3,7 @@ import random
 import sys
 from multiprocessing import Process, freeze_support
 from time import sleep
+from elevate import elevate
 
 from keyboard import is_pressed
 from pyftpdlib.authorizers import DummyAuthorizer
@@ -24,12 +25,15 @@ def start_ftp(log_dir):
 
 
 def main():
+
+    elevate(graphical=False)
+
     freeze_support()
 
     seed = random.randrange(sys.maxsize)
     #seed = value
     motor_data_loss_rng = random.Random(seed+2)
-    print(f'Packet loss rng seed: {seed}')
+    print('Packet loss rng seed: {seed}')
 
     # Load configuration file
     load_configuration()
