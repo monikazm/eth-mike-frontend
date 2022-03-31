@@ -3,7 +3,7 @@ import random
 import sys
 from multiprocessing import Process, freeze_support
 from time import sleep
-from elevate import elevate
+
 
 from keyboard import is_pressed
 from pyftpdlib.authorizers import DummyAuthorizer
@@ -25,8 +25,10 @@ def start_ftp(log_dir):
 
 
 def main():
-
-    elevate(graphical=False)
+    from sys import platform
+    if platform == "linux" or platform == "linux2":
+        from elevate import elevate
+        elevate(graphical=False)
 
     freeze_support()
 
