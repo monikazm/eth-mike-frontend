@@ -10,7 +10,7 @@ call venv\Scripts\activate.bat
 pip install -r requirements.txt
 
 REM -- Build self-contained exe file using PyInstaller
-python -OO -m PyInstaller --clean --noupx --exclude-module FixTk --exclude-module tcl --exclude-module tk --exclude-module _tkinter --exclude-module tkinter --exclude-module Tkinter --onefile mike_simulator\main.py
+python -OO -m PyInstaller --clean --noupx --exclude-module FixTk --exclude-module tcl --exclude-module tk --exclude-module _tkinter --exclude-module tkinter --exclude-module Tkinter --onefile main.py
 
 REM -- Rename the created exe and move it to root directory
 copy dist\main.exe Simulator.exe

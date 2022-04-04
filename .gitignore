@@ -2,6 +2,8 @@
 simulator_config.ini
 logs/
 venv/
+.venv/
+.vscode
 *.exe
 
 # Created by https://www.gitignore.io/api/pycharm
